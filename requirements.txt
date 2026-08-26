@@ -4,6 +4,9 @@ Flask-Migrate==4.0.7
 Flask-Login==0.6.3
 psycopg2-binary==2.9.9
 reportlab==4.1.0
+Pillow==11.0.0
 google-cloud-storage==2.16.0
+google-cloud-aiplatform==1.70.0
+sendgrid==6.11.0
 gunicorn==22.0.0
 Werkzeug==3.0.3

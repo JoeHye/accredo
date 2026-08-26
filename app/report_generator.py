@@ -1,14 +1,16 @@
 import os
+import io
 import logging
 from datetime import datetime
 from xml.sax.saxutils import escape
+from PIL import Image as PILImage
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle, Image as RLImage
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
 from app import db
-from app.models import Application, StandardPack, Criterion, Response, Portfolio, EvidenceDocument
+from app.models import Application, StandardPack, Criterion, Response, Portfolio, EvidenceDocument, TableRowData
 
 logger = logging.getLogger(__name__)
 
@@ -89,6 +91,9 @@ def generate_report(application_id: int) -> str:
         incomplete_style = ParagraphStyle('IncompleteText', parent=styles['Normal'], fontSize=9.5, leading=13, textColor=colors.HexColor("#dc2626"), fontName="Helvetica-Bold", leftIndent=12, spaceAfter=8)
         na_banner_style = ParagraphStyle('NABanner', parent=styles['Normal'], fontSize=10, leading=13, textColor=colors.HexColor("#d97706"), fontName="Helvetica-Bold", leftIndent=12, spaceAfter=8, spaceBefore=4)
 
+        table_cell_style = ParagraphStyle('TableCell', parent=styles['Normal'], fontSize=8.5, leading=11, textColor=colors.HexColor("#0f172a"))
+        table_header_style = ParagraphStyle('TableCellHeader', parent=styles['Normal'], fontSize=8.5, leading=11, textColor=colors.HexColor("#0f172a"), fontName='Helvetica-Bold')
+
         story = []
         story.append(Spacer(1, 100))
         story.append(Paragraph("ACCSC Self-Evaluation Report (SER)", title_style))
@@ -131,12 +136,70 @@ def generate_report(application_id: int) -> str:
                     if crit.answer_type == "exhibit":
                         docs = EvidenceDocument.query.filter_by(response_id=resp.id).all() if resp else []
                         if docs:
-                            filenames = ", ".join([safe_text(d.filename) for d in docs])
-                            story.append(Paragraph(f"<b>Attached:</b> {filenames}", narrative_style))
+                            gcs_bucket_name = os.environ.get("GCS_BUCKET_NAME")
+                            for d in docs:
+                                ext = d.filename.rsplit(".", 1)[1].lower() if "." in d.filename else ""
+                                if ext in {"jpg", "jpeg", "png"}:
+                                    file_bytes = None
+                                    try:
+                                        if gcs_bucket_name and d.gcs_path.startswith("gs://"):
+                                            from google.cloud import storage
+                                            client = storage.Client()
+                                            prefix = f"gs://{gcs_bucket_name}/"
+                                            blob_path = d.gcs_path[len(prefix):] if d.gcs_path.startswith(prefix) else d.gcs_path
+                                            bucket = client.bucket(gcs_bucket_name)
+                                            blob = bucket.blob(blob_path)
+                                            file_bytes = blob.download_as_bytes()
+                                        else:
+                                            if os.path.exists(d.gcs_path):
+                                                with open(d.gcs_path, "rb") as f:
+                                                    file_bytes = f.read()
+
+                                        if file_bytes:
+                                            pil_img = PILImage.open(io.BytesIO(file_bytes))
+                                            orig_w, orig_h = pil_img.size
+                                            max_w = 400
+                                            if orig_w > max_w:
+                                                scaled_w = max_w
+                                                scaled_h = int(orig_h * (max_w / float(orig_w)))
+                                            else:
+                                                scaled_w = orig_w
+                                                scaled_h = orig_h
+
+                                            img_io = io.BytesIO(file_bytes)
+                                            rl_img = RLImage(img_io, width=scaled_w, height=scaled_h)
+                                            story.append(rl_img)
+                                            story.append(Paragraph(f"<b>Attached Image:</b> {safe_text(d.filename)}", narrative_style))
+                                        else:
+                                            story.append(Paragraph(f"<b>Attached Image:</b> {safe_text(d.filename)} <i>[File content unreadable]</i>", narrative_style))
+                                    except Exception as img_err:
+                                        logger.error(f"Failed to embed image exhibit {d.filename}: {str(img_err)}", exc_info=True)
+                                        story.append(Paragraph(f"<b>Attached Image:</b> {safe_text(d.filename)} <i>[Error loading image]</i>", narrative_style))
+                                elif ext == "pdf":
+                                    story.append(Paragraph(f"<b>Attached (PDF):</b> {safe_text(d.filename)}", narrative_style))
+                                elif ext in {"doc", "docx"}:
+                                    story.append(Paragraph(f"<b>Attached (Word):</b> {safe_text(d.filename)}", narrative_style))
+                                else:
+                                    story.append(Paragraph(f"<b>Attached:</b> {safe_text(d.filename)}", narrative_style))
                         else:
                             story.append(Paragraph("[EXHIBIT REQUIRED — FILE UPLOAD NOT YET IMPLEMENTED]", incomplete_style))
                     elif crit.answer_type == "table_rows":
-                        story.append(Paragraph("[TABLE DATA — STRUCTURED INPUT NOT YET IMPLEMENTED]", incomplete_style))
+                        rows = TableRowData.query.filter_by(response_id=resp.id).order_by(TableRowData.row_index).all() if resp else []
+                        if rows and crit.table_columns:
+                            table_data = [[Paragraph(safe_text(col), table_header_style) for col in crit.table_columns]]
+                            for r in rows:
+                                table_data.append([Paragraph(safe_text(r.row_data.get(col, "")), table_cell_style) for col in crit.table_columns])
+                            t = Table(table_data, hAlign='LEFT')
+                            t.setStyle(TableStyle([
+                                ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#f1f5f9")),
+                                ('TEXTCOLOR', (0,0), (-1,0), colors.HexColor("#0f172a")),
+                                ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#cbd5e1")),
+                                ('TOPPADDING', (0,0), (-1,-1), 4),
+                                ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+                            ]))
+                            story.append(t)
+                        else:
+                            story.append(Paragraph("[TABLE DATA — NOT YET ANSWERED]", incomplete_style))
                     else:
                         if narrative.strip():
                             escaped_narrative = safe_text(narrative).replace('\n', '<br/>')

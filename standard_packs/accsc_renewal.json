@@ -1,0 +1,3060 @@
+{
+  "standard_pack_id": "accsc-renewal-v2026.07",
+  "accrediting_body": "ACCSC",
+  "application_type": "renewal",
+  "version_effective_date": "2026-07-01",
+  "sections": [
+    {
+      "section_code": "0",
+      "section_name": "INTRODUCTION - INSTITUTIONAL ELIGIBILITY REQUIREMENTS",
+      "subsections": [
+        {
+          "subsection_code": "A",
+          "subsection_name": "HISTORY",
+          "criteria": [
+            {
+              "criterion_id": "REN-0-A-1",
+              "item_number": "1",
+              "question": "Describe the school's history including when it first began enrolling students, first received accreditation from ACCSC, and other significant events in the school's history.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-0-A-2",
+              "item_number": "2",
+              "question": "In the following chart, list and provide the dates of all changes of con trol/ownership, name, location, addition of programs, separate facilities, and other substantive changes that have occurred in the last five years. Approval Date Month/Year",
+              "answer_type": "table_rows",
+              "required": true,
+              "table_columns": [
+                "Approval Date (Month/Year)",
+                "Substantive Change"
+              ],
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "B",
+          "subsection_name": "OWNERSHIP AND ORGANIZATION",
+          "criteria": [
+            {
+              "criterion_id": "REN-0-B-1",
+              "item_number": "1",
+              "question": "Provide as an exhibit a chart of the ownership structure of the school, including all entities and individuals in the chain of ownership and any additional information necessary to explain the ownership structure.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-0-B-2",
+              "item_number": "2",
+              "question": "Provide as an exhibit an organizational chart of the school's management structure.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "C",
+          "subsection_name": "MISSION AND EDUCATIONAL OBJECTIVES",
+          "criteria": [
+            {
+              "criterion_id": "REN-0-C-1",
+              "item_number": "1",
+              "question": "Provide the school's mission statement and primary educational objectives.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-0-C-2",
+              "item_number": "2",
+              "question": "Explain the reasons the school initially decided to offer and continues to offer each program; include a summary of external validations (e.g., market research, employer feedback).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-0-C-3",
+              "item_number": "3",
+              "question": "Does the school offer programs or courses that do not fall within the Commission's scope of review (e.g., non-vocational educational objectives such as GED preparation, refresher training, avocational courses, continuing education, etc.)? If so, provide as an exhibit a list of the programs or courses and the percentage of the school's students enrolled in each of these programs or courses and collectively in all such programs or courses.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-0-C-4",
+              "item_number": "4",
+              "question": "Describe any contractual arrangements the school has with businesses or government agencies to offer specialty training (e.g., group training, off-site training, modified program offerings, individually design curriculum, etc.). Maintain a copy of each contract and make the documentation available for review during the on-site evaluation.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "D",
+          "subsection_name": "ACCSC ACTIONS AND ANNUAL REPORT REVIEW",
+          "criteria": [
+            {
+              "criterion_id": "REN-0-D-1",
+              "item_number": "1",
+              "question": "List any Stipulations, Reporting Enclosures, or Institutional Enhancement Enclosures cited in the school's most recent grant of accreditation letter, and in any other Commission correspondence to the school within the school's most recent accreditation cycle. Describe the school's efforts to achieve and maintain ongoing compliance in these areas. --------------------- ---------- -------- ------- ---------- -------- ------- -------- ------- -------- ------- -------- -------",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-0-D-2",
+              "item_number": "2",
+              "question": "Provide the following information: the annual gross tuition revenue of the school for the most recent fiscal year, the number of students enrolled as of June",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-0-D-30",
+              "item_number": "30",
+              "question": "Annual Gross Number Tuition Revenue of Students Enrolled as of June 30",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-0-D-3",
+              "item_number": "3",
+              "question": "Complete the following summary chart of student achievement outcomes for each program or program length offered using the data submitted in the school's Annual Report for the last five years including the most recently submitted Annual Report: Program Name Length July July July July July (Credential) in 20xx 20xx 20xx 20xx 20xx Months Report Report Report Report Report Date Date Date Date Date G E G E G E G E G E *G = Graduation Rate & E = Employment Rate*",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-0-D-4",
+              "item_number": "4",
+              "question": "List each program for which certification or licensure is required in order for graduates to be eligible for employment in the field for which training was provided.",
+              "answer_type": "table_rows",
+              "required": true,
+              "table_columns": [
+                "Program Title",
+                "Length in Months",
+                "Exam Title",
+                "Student Pass Rate"
+              ],
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-0-D-5",
+              "item_number": "5",
+              "question": "Provide as an exhibit a copy of the letter from ACCSC acknowledging the school's Application for Renewal of Accreditation.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "E",
+          "subsection_name": "FEDERAL, STATE, AND LOCAL GOVERNMENT REQUIREMENTS",
+          "criteria": [
+            {
+              "criterion_id": "REN-0-E-1",
+              "item_number": "1",
+              "question": "Provide the following information regarding requirements with which the school must comply that are significantly different or more stringent than ACCSC standards.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-0-E-1-a",
+                  "item_number": "1.a",
+                  "question": "Any state specific student refund requirements;",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-0-E-1-b",
+                  "item_number": "1.b",
+                  "question": "Any state specific requirements (i.e. licensure) for faculty;",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-0-E-1-c",
+                  "item_number": "1.c",
+                  "question": "Any state or local government requirements for fire, safety, sanitation, and insurance;",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-0-E-1-d",
+                  "item_number": "1.d",
+                  "question": "Any state program requirements; and",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-0-E-1-e",
+                  "item_number": "1.e",
+                  "question": "Any other additional requirements by federal, state, or local government agencies or other accrediting bodies that that are significantly different or more stringent than ACCSC standards.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_code": "I",
+      "section_name": "MANAGEMENT AND ADMINISTRATIVE OPERATIONS",
+      "subsections": [
+        {
+          "subsection_code": "A",
+          "subsection_name": "OWNERSHIP, MANAGEMENT, AND ADMINISTRATIVE CAPACITY",
+          "criteria": [
+            {
+              "criterion_id": "REN-I-A-1",
+              "item_number": "1",
+              "question": "Describe how the school is managed (including campus-based and corporate oversight) and how this system effectively ensures that the school meets its objectives, fulfills its obligations to students, and meets or exceeds accrediting standards on an ongoing basis.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-A-2",
+              "item_number": "2",
+              "question": "List all individuals responsible for full-time on-site management of the school (including campus-based and corporate oversight) and include as an exhibit a Staff Personnel Report for each individual listed. Provide a detailed description of how each member of the management team is qualified for his or her particular role, including education, training, experience, and demonstrated ability to lead and manage a post-secondary educational institution..",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-A-3",
+              "item_number": "3",
+              "question": "What is the school's process for ensuring that members of the management staff demonstrate a commitment to providing quality education to students; ethical, fair, and honest practice; and compliance with accrediting standards and applicable federal, state, and local requirements?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-A-4",
+              "item_number": "4",
+              "question": "What is the process for developing, reviewing, and updating the school's administrative and operational policies and procedures? Describe how the school ensures policies and procedures are appropriate to the school's operations and mission.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-A-5",
+              "item_number": "5",
+              "question": "Describe the on-going development and training activities that support members of school management and administrative employees in their particular roles in the school.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-A-6",
+              "item_number": "6",
+              "question": "Provide a list of all management, educational, and administrative staff (including corporate staff as applicable) who have been employed by the school since the last accreditation review in the following format, organized by position. Pos ition \\* The Commission may survey current employees of the school prior to the on-site evaluation.",
+              "answer_type": "table_rows",
+              "required": true,
+              "table_columns": [
+                "Position",
+                "Staff Member's Name",
+                "FT/PT",
+                "Date Assumed Duties (Mo/Yr)",
+                "Date Employment Ceased (Mo/Yr)",
+                "# of Years Employed",
+                "Reason for Employment Ceased",
+                "Email Address (current employees only)"
+              ],
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-A-7",
+              "item_number": "7",
+              "question": "What is the average tenure (expressed in years) of the current management, educational, and administrative staff? What impact has this level of tenure had on school operations?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "B",
+          "subsection_name": "INSTITUTIONAL ASSESSMENT AND IMPROVEMENT ACTIVITIES",
+          "criteria": [
+            {
+              "criterion_id": "REN-I-B-1",
+              "item_number": "1",
+              "question": "Describe the school's process for ongoing institutional assessment and improvement activities. Explain how the activities are appropriate to the size and scale of the school's operations.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-B-2",
+              "item_number": "2",
+              "question": "As an exhibit, provide current assessment and improvement activities in the areas of management; fiscal condition and budget; administrative policies and practices; student support services; faculty and staff development; educational program curricula; learning resources system, equipment, and supporting materials; facilities; and student achievement outcomes.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "C",
+          "subsection_name": "FINANCIAL STABILITY AND RESPONSIBILITY",
+          "criteria": [
+            {
+              "criterion_id": "REN-I-C-1",
+              "item_number": "1",
+              "question": "Describe the school's current financial structure and explain how the school has sufficient resources for the proper operation of the school and discharge of obligations to students.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-C-2",
+              "item_number": "2",
+              "question": "Describe the school's budgeting process. How does the school monitor its budgetary projections in relation to actual income and expenses on a regular basis throughout the fiscal year?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-C-3",
+              "item_number": "3",
+              "question": "How has the school allocated working capital for expenditures required to ensure the proper operation of the school and the discharge of the school's obligations to students as well as expenditures for institutional improvement and faculty development activities?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-C-4",
+              "item_number": "4",
+              "question": "Attach as an exhibit a copy of the school's current fiscal year budget with a budget-to-actual analysis as of one month prior to the due date of the Self-Evaluation Report.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "D",
+          "subsection_name": "TUITION, CANCELLATION, REFUND, AND PAYMENT POLICIES",
+          "criteria": [
+            {
+              "criterion_id": "REN-I-D-1",
+              "item_number": "1",
+              "question": "Tuition Policies",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-I-D-1-a",
+                  "item_number": "1.a",
+                  "question": "Describe how the school ensures that all tuition costs and charges, tuition discounts, and all costs incidental to training are fully, clearly, and accurately disclosed to the prospective student before enrollment and fairly applied.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-I-D-1-b",
+                  "item_number": "1.b",
+                  "question": "Describe the school's tuition policies, including the following: (i) What is the period of enrollment for which tuition is charged (e.g., by semester, module, or entire program)? (ii) Does the school require payment in advance or is there a provision for payment plans? Does the school allow students to pay a portion of their tuition by making continuing payments beyond graduation? (iii) If the school offers a payment plan, are students allowed to make four or more payments? If so, explain how disclosures to students regarding the school's payment plan are in compliance with the federal Truth in Lending Act (Regulation Z).",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-I-D-1-c",
+                  "item_number": "1.c",
+                  "question": "Does the school offer tuition discounts? If so, how does the school ensure it is a bona fide reduction in the tuition that would otherwise be charged? List the tuition discounts available to students.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-I-D-1-d",
+                  "item_number": "1.d",
+                  "question": "List the grants or scholarships available to students and for each describe the financial assistance funding source, the recognized and acceptable purposes, specific eligibility criteria, the selection process, and the amounts awarded.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-I-D-1-e",
+                  "item_number": "1.e",
+                  "question": "Does the school reserve the right to change tuition? If so, how are students informed of the school's policy in this regard and how are students informed in advance of the tuition changes?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-I-D-2",
+              "item_number": "2",
+              "question": "Cancellation Policies",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-I-D-2-a",
+                  "item_number": "2.a",
+                  "question": "What is the school's cancellation policies? Attach as an exhibit copies of the required cancellation policies.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-I-D-3",
+              "item_number": "3",
+              "question": "Refund Policies",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-I-D-3-a",
+                  "item_number": "3.a",
+                  "question": "What are the refund policies required by state, federal, and other third parties, and how does the school's refund policy comply with those requirements? Attach as an exhibit copies of the required refund policies. Student Prog ram Start Withdrawn / Refund Amount Due Date Name / ID Date Termination Due Paid Date Paid \\# Date ----------- -------- ----- --------- ------------- ---------- ---------- -------- --------",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-I-D-4",
+              "item_number": "4",
+              "question": "Payment Policies",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-I-D-4-a",
+                  "item_number": "4.a",
+                  "question": "Does the school have payment policies? If so, how does the school ensure the requirements for student tuition and fee payments are set forth in the applicable documents? Attach as an exhibit copies of the applicable documents.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-I-D-4-b",
+                  "item_number": "4.b",
+                  "question": "Does the school the school utilize promissory notes or contracts for tuition that are sold or discounted to third parties? If so, describe how the school ensures students are informed of these policies.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-I-D-4-c",
+                  "item_number": "4.c",
+                  "question": "Describe how the school's methods in requesting or demanding payment are in good taste and follow sound and ethical business practices.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "subsection_code": "E",
+          "subsection_name": "STUDENT LOAN REPAYMENT",
+          "criteria": [
+            {
+              "criterion_id": "REN-I-E-1",
+              "item_number": "1",
+              "question": "Describe the school's efforts to promote student loan repayment of financial obligations, including guaranteed loans used to finance students' education. Provide as an exhibit a copy of the school's written comprehensive repayment plan, which addresses such areas as student loan information, advising and monitoring, cooperation with lenders, and collection of information to facilitate location of borrowers. ----------------------- ----------------------- -----------------------",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-E-2",
+              "item_number": "2",
+              "question": "If applicable, provide the school's three (3) most recent years final cohort default rates in the chart below. Year: Year: Year: If the most recent of these rates is above the U. S. Department of Education threshold or if the rate has increased year over year, explain the circumstances that caused this rate or rate increase and describe the initiatives to improve the rates.",
+              "answer_type": "table_rows",
+              "required": true,
+              "table_columns": [
+                "Fiscal Year",
+                "Cohort Default Rate (%)"
+              ],
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "F",
+          "subsection_name": "INSTITUTIONAL NAME",
+          "criteria": [
+            {
+              "criterion_id": "REN-I-F-1",
+              "item_number": "1",
+              "question": "Is the school name approved in the state(s) in which the school operates?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-F-2",
+              "item_number": "2",
+              "question": "If the school uses the term \"University\" in its name, please include as an exhibit a copy of the approval for the institution to use the title of \"University\" by any relevant state body.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "G",
+          "subsection_name": "PHYSICAL FACILITIES AND EMERGENCY PREPAREDNESS",
+          "criteria": [
+            {
+              "criterion_id": "REN-I-G-1",
+              "item_number": "1",
+              "question": "Explain the requirements for fire, safety, and sanitation for all facilities owned or controlled for administrative, instructional, and housing purposes. Provide as an exhibit documentation from the appropriate regulatory authorities, demonstrating current compliance with the stated requirements.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-G-2",
+              "item_number": "2",
+              "question": "Describe the school's physical facilities and explain how the facilities are sufficient in size and quality to provide an effective and suitable environment to facilitate learning. Describe any significant changes made to the physical facility in the last two years.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-I-G-3",
+              "item_number": "3",
+              "question": "Describe the school's written emergency preparedness plan that is part of the school's institutional assessment and improvement planning activities. Describe how the plan is made available to all staff, faculty, and students. Describe how the plan includes emergency scenario identification and concordant actions plans; evacuation and lockdown procedures; communication protocols for sharing information with appropriate parties during and following an indecent; orientation for students; and regular training for staff and faculty. Provide as an exhibit a copy of the school's most recent emergency preparedness plan.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_code": "II",
+      "section_name": "PROGRAM REQUIREMENTS",
+      "subsections": [
+        {
+          "subsection_code": "A",
+          "subsection_name": "GENERAL PROGRAM REQUIREMENTS",
+          "criteria": [
+            {
+              "criterion_id": "REN-II-A-1",
+              "item_number": "1",
+              "question": "Approval and Programmatic Accreditation",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-A-1-a",
+                  "item_number": "1.a",
+                  "question": "Confirm that each program has been reviewed and approved by the Commission before being offered to students. If not, provide an explanation.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-1-b",
+                  "item_number": "1.b",
+                  "question": "Describe how the school has sufficient experience to offer all approved and active programs and the school's process for maintaining the resources necessary to continue offering the programs.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-II-A-2",
+              "item_number": "2",
+              "question": "Program Design and Development",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-A-2-a",
+                  "item_number": "2.a",
+                  "question": "Describe the school's process for the design and development of appropriate education and training programs including a detailed description of curriculum design, identification of learning materials and resources, development of student learning outcomes and competencies, and student assessment plans for which the institution has obtained input from appropriate internal and external resources.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-2-b",
+                  "item_number": "2.b",
+                  "question": "Describe how the school determines the need and viability of the educational program using external validation (e.g., local demand for training, local employment outlook, earning potential of graduates, other factors that might affect the continued success of the program, etc.).",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-2-c",
+                  "item_number": "2.c",
+                  "question": "Describe how the school's process supports articulation opportunities with other academic and training programs, where appropriate",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-2-d",
+                  "item_number": "2.d",
+                  "question": "Describe how the school's process addresses the instructional and teaching methods to be used in delivering the program content.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-2-e",
+                  "item_number": "2.e",
+                  "question": "Describe how the school's process involves administrative and instructional staff, students, and graduates when appropriate.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-II-A-3",
+              "item_number": "3",
+              "question": "Program Organization and Length",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-A-3-a",
+                  "item_number": "3.a",
+                  "question": "For technical and occupationally related courses, explain how the courses are directly related and applicable to a specific occupation or occupational cluster and provide education and training in the areas associated with theoretical knowledge, technical skills, occupationally related skills, and associated competencies necessary for a student to achieve the program objectives.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-3-b",
+                  "item_number": "3.b",
+                  "question": "For applied general education courses explain how the courses place an emphasis on practical applications of principles and theory associated with a particular occupation or occupational cluster and are directly applicable to a specific occupation or occupational cluster in areas such as related written and oral communication; quantitative principles; natural and physical sciences; STEM (science, technology, engineering, and math); social and behavioral sciences; technology; and humanities and fine arts.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-3-c",
+                  "item_number": "3.c",
+                  "question": "For academic general education courses explain how the courses place an emphasis on principles and theories not associated with a particular occupation or profession and are expected to develop critical thinking, problem solving and analytical skills; enable individuals to prepare for and advance in their professional lives; and contribute to lifelong learning.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-3-d",
+                  "item_number": "3.d",
+                  "question": "For academic general education courses, explain how the courses are comprised of at least 15 hours of didactic learning and 30 hours of out-of-class work/preparation per semester credit hour or at least 10 hours of didactic learning and 20 hours of out-of-class work/preparation per quarter credit hour. Alternatively, explain how the courses are comprised of an equivalent amount of in-class and out-of-class time and work and how the courses conform to generally accepted practices in higher education.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-3-e",
+                  "item_number": "3.e",
+                  "question": "For schools that convert clock hours to credit hours, describe the school's policy and procedure for determining how credit hours are awarded in its courses and programs, including the process and procedures the school uses to ensure that the assignment of credit hours conforms to commonly accepted practice in higher education.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-3-f",
+                  "item_number": "3.f",
+                  "question": "For programs measured in credit hours, describe the institutional processes and procedures used to determine the average amount of time expected for out of class preparation. Include a descriptive narrative of how out-of-class work is assigned and graded and how the school ensures the consistent application of identified policies and procedures.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-3-g",
+                  "item_number": "3.g",
+                  "question": "For programs measured in credit hours, confirm each program is comprised of a majority of courses that require out-of-class work/preparation.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-II-A-4",
+              "item_number": "4",
+              "question": "Program Evaluation",
+              "answer_type": "table_rows",
+              "required": true,
+              "table_columns": [
+                "Program (by Program Area)",
+                "Meeting Date",
+                "# Members Present (Non-School Employees)",
+                "Program Objectives Reviewed",
+                "Program Length Reviewed",
+                "Curriculum Content Reviewed",
+                "Learning Resources Reviewed",
+                "Facilities/Equipment Reviewed",
+                "Student Achievement Rates Reviewed",
+                "Distance Education Reviewed"
+              ],
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-A-4-a",
+                  "item_number": "4.a",
+                  "question": "Describe the school's systematic and evidence-based process to evaluate curriculum and course content (i.e., academic general education, applied general education, technical and occupational courses, electives, etc.), assess the appropriateness of that coursework in relation to program objectives, assess the adequacy of program equipment and supporting resource materials; assess student achievement outcomes and program viability, and make revisions to the curriculum as deemed necessary.",
+                  "answer_type": "table_rows",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-4-b",
+                  "item_number": "4.b",
+                  "question": "Describe how the school's program evaluation process is comprehensive, conducted by faculty and educational administrators regularly, and uses input from internal and external sources.",
+                  "answer_type": "table_rows",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-4-c",
+                  "item_number": "4.c",
+                  "question": "Describe how the school gives consideration to the input received from the sources which are a part of its program evaluation process.",
+                  "answer_type": "table_rows",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-4-d",
+                  "item_number": "4.d",
+                  "question": "Program Advisory Committees (i) Describe the school's process for ensuring the Program Advisory Committee is comprised of appropriately qualified representatives external to the institution (i.e., non-school employees) who can provide a meaningful review of the school's programs and supporting resources and materials. (ii) Describe the school's process for considering Program Advisory Committee input and how the school documents review and implementation of input. Provide as an exhibit samples of documentation of the school's consideration of Program Advisory Committee input. (iii) Does the school hold Program Advisory Committee meetings at the physical campus? If not, describe how the school provides the committee with a sufficiently detailed description and virtual tour of the equipment and facilities representing current conditions at the school. (iv) Demonstrate through completion of the following chart that the school conducts at least one regularly scheduled meeting annually for the Program Advisory Committee for each program or group of related programs and that this meeting reviews all required elements. List all meetings held since the last review of accreditation in the following table. Program Advisory Committee Programs Reviewed (by Program Area) Meeting Date Number (#) of Members Present (Non-School Employees) Was the following reviewed at the PAC meeting? (Check Box if Yes) Program Objectives Program Length Curriculum Content Learning Resources Facilities / Equipment Student Achievement Rates Distance Education \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610",
+                  "answer_type": "table_rows",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-II-A-5",
+              "item_number": "5",
+              "question": "Instructional Materials and Equipment -- See Appendix A",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-II-A-6",
+              "item_number": "6",
+              "question": "Learning Resource System",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-A-6-a",
+                  "item_number": "6.a",
+                  "question": "Describe the extent and nature of the school's learning resource system.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-6-b",
+                  "item_number": "6.b",
+                  "question": "Explain how the student body is adequately served and has ready access to sufficient and appropriate resource materials within the learning resource system.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-6-c",
+                  "item_number": "6.c",
+                  "question": "Describe the budgetary allocations for the learning resource system and how the allocations provide an appropriate level of support to the educational resources and programs of study.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-6-d",
+                  "item_number": "6.d",
+                  "question": "As an exhibit, provide a Staff Personnel Report for the individual/s assigned to manage and oversee the learning resource system that includes the qualifications of the individual/s. If the school offers a baccalaureate degree or higher, document that the learning resource system is coordinated by an individual holding a Master of Library Science credential or equivalent education and experience.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-6-e",
+                  "item_number": "6.e",
+                  "question": "How do qualified school personnel orient, train, and assist students and faculty in the use of the learning resource system?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-6-f",
+                  "item_number": "6.f",
+                  "question": "Describe the school's written policies and procedures for ongoing development of the school's learning resource system as part of its institutional improvement activities.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-II-A-7",
+              "item_number": "7",
+              "question": "Externships \u2610 Please check this box if this section is not applicable (i.e. the school does not offer externship).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-A-7-a",
+                  "item_number": "7.a",
+                  "question": "Describe how school personnel train and orient the on-site supervisor at the externship site on the externship processes and criteria. Also, describe how this ensures appropriate and fair measurement of demonstrated competency and skill attainment.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-7-b",
+                  "item_number": "7.b",
+                  "question": "If an externship is greater than one-third of the total length of the program, provide documentation that it has been reviewed and approved by the Commission with the exception of cases where the length of the externship is due to requirements of another accrediting or certification agency. In such instances, schools must provide evidence of these requirements to the Commission.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-II-A-8",
+              "item_number": "8",
+              "question": "Consortium/Partnership Agreements \u2610 Please check this box if this section is not applicable (i.e. the school does not have consortium/partnership agreement). Please indicate the type of consortium/partnership the school is currently approved for (e.g. distance education, facility only, on-ground education delivery by partner entity).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-A-8-a",
+                  "item_number": "8.a",
+                  "question": "Explain how the school retains responsibility for the quality of the courses of study and programs offered as well as the achievement of expected and acceptable outcomes irrespective of any such consortium partnership agreement (e.g. student support services, academic advising, tutoring, faculty working relationship with students, etc.)",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-8-b",
+                  "item_number": "8.b",
+                  "question": "For each program offered via a consortium/partnership agreement, provide the total percentage of each program being offered by or at the partner entity?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-II-A-9",
+              "item_number": "9",
+              "question": "Independent Study \u2610 Please check this box if this section is not applicable (i.e. the school does not offer independent study).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-A-9-a",
+                  "item_number": "9.a",
+                  "question": "If the school offers independent study options, how has the school determined that independent study is relevant and appropriate to program objectives?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-9-b",
+                  "item_number": "9.b",
+                  "question": "What are the educational objectives and written outlines of the competencies to be achieved through independent study? What is the school's credit award rationale for independent study?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-9-c",
+                  "item_number": "9.c",
+                  "question": "What elements are used to measure achieved student competency relative to the required subject matter objectives (e.g., the required readings, research, examinations, reports, research papers, portfolios, or similar assignments)?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-9-d",
+                  "item_number": "9.d",
+                  "question": "What is the maximum percent of the curriculum that students may take for credit via independent study?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-II-A-10",
+              "item_number": "10",
+              "question": "Transfer of Credit and Prior Learning Experience \u2610 Please check this box if this section is not applicable (i.e. the school does not accept transfer credit or have a prior learning experience policy).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-A-10-a",
+                  "item_number": "10.a",
+                  "question": "Does the school accept transfer credit for coursework completed in other post-secondary institutions? If so, describe the school's transfer of credit policy for determining whether these courses are comparable in scope and content to the school's own coursework. If no, describe the school's reasons for declining to accept credit in transfer.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-10-b",
+                  "item_number": "10.b",
+                  "question": "Describe the school's process for the evaluation and acceptance of transfer credits. What percentage of credits for a non-degree and undergraduate degree may be transferred?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-10-c",
+                  "item_number": "10.c",
+                  "question": "What is the school's process for maintaining documentation of the transfer of credit evaluation process?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-A-10-d",
+                  "item_number": "10.d",
+                  "question": "Does the school award credit based on an assessment of an incoming student's prior learning experience (i.e. experience acquired outside of formal instruction or educational settings provided at the school)? If so, describe the school's criteria for evaluating prior learning equivalency.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "subsection_code": "B",
+          "subsection_name": "NON-DEGREE PROGRAMS",
+          "criteria": [
+            {
+              "criterion_id": "REN-II-B-1",
+              "item_number": "1",
+              "question": "Explain how each non-degree program is designed and offered in a way that appropriately balances distinct methods of education and training and includes a comprehensive curriculum with appropriate coursework to achieve the program objectives.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-II-B-2",
+              "item_number": "2",
+              "question": "Explain how each program is comprised of at least 80% technical and occupationally related courses. Explain how the remaining courses are appropriate and necessary to achieve the program objectives.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "C",
+          "subsection_name": "DEGREE PROGRAMS",
+          "criteria": [
+            {
+              "criterion_id": "REN-II-C-1",
+              "item_number": "1",
+              "question": "General Requirements",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-C-1-a",
+                  "item_number": "1.a",
+                  "question": "Program Structure and Development (i) Explain how each degree program is comprised of courses that are appropriate to the academic level and type of degree offered. (ii) Explain how the course numbering system differentiates between lower level courses required at the associate degree level; upper level courses required at the baccalaureate degree level; and graduate level courses at the master's degree level.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-II-C-2",
+              "item_number": "2",
+              "question": "Associate's Degrees",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-C-2-a",
+                  "item_number": "2.a",
+                  "question": "Explain how each associate degree program is designed and offered in a way that appropriately balances distinct types of education and training and includes a comprehensive curriculum with appropriate coursework to achieve the program objectives.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-C-2-b",
+                  "item_number": "2.b",
+                  "question": "If the school offers an occupational associate degree program, describe how the title of the degree program, the name of the degree, the credential issued, the program description in the school's catalog, and all advertising, promotional materials and literature make clear that the degree is occupational, not academic.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-C-2-c",
+                  "item_number": "2.c",
+                  "question": "For each occupational associate degree program, confirm that each program includes the following: - A minimum of 60 semester hours or 90 quarter hours including: - A minimum of 9 semester hours or 13.5 quarter hours in academic general education courses or applied general education courses - An occupational associate degree program must include a minimum of 45 semester hours or 67.5 quarter hours in technical and occupationally related courses that are directly associated with the field for which the degree is offered. If any occupational associate degree program does not include the items listed above, provide an explanation.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-C-2-d",
+                  "item_number": "2.d",
+                  "question": "If the school offers an academic associate degree program, describe how the degree program includes academic general education courses in written and oral communication and quantitative principles. Document that the remainder of the required academic general education courses provides an appropriate balance of natural and physical sciences; social and behavioral sciences; and humanities and fine arts, which are designed to develop essential academic skills for enhanced and continued learning.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-C-2-e",
+                  "item_number": "2.e",
+                  "question": "For each academic degree program, confirm that each program includes the following: - A minimum of 60 semester hours or 90 quarter hours including: - A minimum of 15 semester hours or 22.5 quarter hours in academic general education courses. - a minimum of 30 semester hours or 45 quarter hours in the technical field for which the degree is awarded If any academic associate degree program does not include the items listed above, provide an explanation.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-C-2-f",
+                  "item_number": "2.f",
+                  "question": "Does any associate degree program exceed by more than 50% the minimum number of credit hours required to confer the degree by the appropriate regulatory agency in the state(s) in which the school operates or in absence of such minimums, explain how the degree compares to generally accepted practices in higher education.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-II-C-3",
+              "item_number": "3",
+              "question": "Baccalaureate Degrees \u2610 Please check this box if this section is not applicable (i.e. the school does not offer baccalaureate degrees).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-C-3-a",
+                  "item_number": "3.a",
+                  "question": "Describe how the school's baccalaureate degree program(s) are designed in a way that appropriately balances distinct types of education and training (i.e., technical and occupationally related courses and academic general education courses), including distinct levels of education and training (i.e., lower level and upper level courses).",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-C-3-b",
+                  "item_number": "3.b",
+                  "question": "Illustrate how baccalaureate degree program(s) include a comprehensive curriculum with appropriate coursework to achieve the program objectives.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-C-3-c",
+                  "item_number": "3.c",
+                  "question": "For each baccalaureate program, confirm that each program includes the following: - A minimum of 120 semester hours or 180 quarter hours including: - A minimum of 30 semester hours or 45 quarter hours in academic general education courses. - a minimum of 60 semester hours or 90 quarter hours in the technical field for which the degree is awarded If any baccalaureate degree program does not include the items listed above, provide an explanation.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-C-3-d",
+                  "item_number": "3.d",
+                  "question": "Does any baccalaureate degree program exceed by more than 50% the minimum number of credit hours required to confer the degree by the appropriate regulatory agency in the state(s) in which the school operates or in absence of such minimums, explain how the degree compares to generally accepted practices in higher education.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-C-3-e",
+                  "item_number": "3.e",
+                  "question": "If the school offers baccalaureate degrees with concentrations: (i) Describe how the concentration provides a focused area of training beyond the generalist level that is appropriate for industry needs and standards. (ii) Confirm that for each program, the concentrations consist of 18-24 semester credit hours (27-36 quarter credit hours) of occupationally specialized course work of which, at a minimum, nine semester credit hours (13.5 quarter credit hours) represent upper level coursework. If not, provide an explanation.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-II-C-4",
+              "item_number": "4",
+              "question": "Master's Degrees \u2610 Please check this box if this section is not applicable (i.e. the school does not offer master's degrees).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-C-4-a",
+                  "item_number": "4.a",
+                  "question": "Program Structure (i) Describe how the institution places emphasis on graduate-level course work, including research and analytical skills, and independent and critical thinking skills. Explain how the master's degree contributes to the field of study and how graduates are able to acquire the necessary competencies and skills for employment in the field of study. (ii) Explain how the length of the master's degree program is appropriate to enable students to achieve the required competencies and skills for employment or advancement in the field for which training is provided. (iii) Verify that the master's degree program curriculum includes an applied, integrated, or culminating experience required for program completion (e.g., capstone experience, comprehensive examination, research project, or thesis).",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-C-4-b",
+                  "item_number": "4.b",
+                  "question": "Program Review (i) Explain how the Master's Degree Program Advisory Committee performs all requirements set forth in *Section II (A)(6)(b) of the Substantive Standards, Standards of Accreditation*. (ii) Explain how graduate faculty and other appropriate school personnel participate in the development, ongoing review, and improvement of graduate level curriculum.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-C-4-c",
+                  "item_number": "4.c",
+                  "question": "For each master's program, confirm that each program includes the following: - A minimum of 30 semester hours or 45 quarter hours including: - A minimum of 24 semester hours or 36 quarter hours in the technical field for which the degree is awarded If any master's program does not include the items listed above, provide an explanation.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-C-4-d",
+                  "item_number": "4.d",
+                  "question": "If the school offers master's degrees with concentrations: (i) Describe how the concentration provides a focused area of training beyond the generalist level that is appropriate for industry needs and standards. (ii) Confirm that for each program, the concentrations consist of 6-12 semester credit hours (9-15 quarter credit hours) of occupationally specialized course work. If not, provide an explanation.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "subsection_code": "D",
+          "subsection_name": "SECONDARY EDUCATIONAL OBJECTIVES",
+          "criteria": [
+            {
+              "criterion_id": "REN-II-D-1",
+              "item_number": "1",
+              "question": "Continuing Education Courses and Avocational Courses[^1]",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-D-1-a",
+                  "item_number": "1.a",
+                  "question": "Does the school offer any continuing education course or avocational course? If so, please list such courses noting any course that the school has applied for and received Commission approval for inclusion in the school's scope of institutional accreditation.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-D-1-b",
+                  "item_number": "1.b",
+                  "question": "Provide as an exhibit a copy of all advertising for continuing education courses and avocational courses.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-D-1-c",
+                  "item_number": "1.c",
+                  "question": "How does the school ensure that an approved continuing education course or avocational course is offered in a manner that delivers the education as promised to students, is of a quality nature consistent with the expectations for an ACCSC approved vocational program, and is included in the school's institutional improvement planning activities?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-D-1-d",
+                  "item_number": "1.d",
+                  "question": "How does the school make its complaint process and procedure available to students enrolled in a continuing education course or avocational course?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-D-1-e",
+                  "item_number": "1.e",
+                  "question": "What is the school's record retention policy for students enrolled in continuing education courses and avocational courses?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-D-1-f",
+                  "item_number": "1.f",
+                  "question": "What is the number of students currently enrolled in continuing education courses and avocational courses offered by the school? What is the percentage of the school's total student population enrolled in continuing education courses and avocational courses, and have continuing education courses and avocational courses remained a secondary objective of the school? \u2610 Please check this box if this section is not applicable (i.e. the school does not offer ESL courses or programs).",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-II-D-2",
+              "item_number": "2",
+              "question": "English as a Second Language",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-II-D-2-a",
+                  "item_number": "2.a",
+                  "question": "Provide a detailed description of each English-as-a-Second-Language (ESL) course of study offered by the school and indicate whether the program is a front-loaded or integrated.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-D-2-b",
+                  "item_number": "2.b",
+                  "question": "Describe the objective of each ESL course of study offered by the school.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-D-2-c",
+                  "item_number": "2.c",
+                  "question": "Describe how each student enrolled in an ESL course of study is tested prior to and at the conclusion of the program. Indicate what nationally recognized test is used and attach as an exhibit copies of all testing materials.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-II-D-2-d",
+                  "item_number": "2.d",
+                  "question": "What is the number of students currently enrolled in an ESL course of study offered by the school? What is the percentage of the school's total student population enrolled in ESL courses, and has ESL remained a secondary objective of the school?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_code": "III",
+      "section_name": "EDUCATIONAL ADMINISTRATION AND FACULTY QUALIFICATIONS",
+      "subsections": [
+        {
+          "subsection_code": "A",
+          "subsection_name": "EDUCATIONAL ADMINISTRATION",
+          "criteria": [
+            {
+              "criterion_id": "REN-III-A-2",
+              "item_number": "2",
+              "question": "List the on-site program head at the school (e.g., lead faculty, department chair, dean) for each distinct occupational area that leads to an occupational or academic degree. Provide a detailed description of how each program head possesses an educational background equal to or exceeding the maximum credential offered in that program area, the requisite qualifications for technical faculty teaching in a degree program, and an ability to administer the occupational components of the program.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-III-A-3",
+              "item_number": "3",
+              "question": "Explain how the school's graduate level education is supervised and coordinated by an individual with an earned doctorate degree. Also explain how this individual, as the director of graduate level education, has the experience and competence to manage the instructional program.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-III-A-4",
+              "item_number": "4",
+              "question": "Explain how each master's degree program is appropriately managed by an individual with a minimum of a graduate degree in the same field for which training is provided.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-III-A-5",
+              "item_number": "5",
+              "question": "Describe the school's process for ongoing faculty assessment. How are faculty members evaluated and how does the school address deficiencies in faculty performance identified through this process?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-III-A-6",
+              "item_number": "6",
+              "question": "Describe the school's plan for ongoing professional development activities for the faculty and educational administrators that: are appropriate to the size and scope of the school's educational programs; support the quality of education provided; and enhance student learning and achievement. These professional development activities should include elements such as continuing education in the subject area(s) taught; teaching skill development; instructional methodology development; membership in trade and professional organizations as appropriate; and other elements appropriate for the ongoing professional development of faculty. Describe an improvement that has occurred as a result of the school's plan for faculty professional development.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-III-A-7",
+              "item_number": "7",
+              "question": "Describe the school's process for verifying prior work experience of its faculty and educational administrators through securing written or verbal verification from previous employers.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-III-A-8",
+              "item_number": "8",
+              "question": "Describe the school's process for securing academic transcripts of academic credentials for faculty and educational administrators.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-III-A-9",
+              "item_number": "9",
+              "question": "What is the average tenure (expressed in years) of the current faculty members? What impact has this level of tenure has had on educational delivery?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-III-A-10",
+              "item_number": "10",
+              "question": "Provide a list of all faculty members who have been employed by the school since the last accreditation review in the following format, organized by position. Pos ition \\*The Commission may survey the school's current faculty members prior to the on-site evaluation.",
+              "answer_type": "table_rows",
+              "required": true,
+              "table_columns": [
+                "Position",
+                "Faculty Member's Name",
+                "FT/PT",
+                "Date Assumed Duties (Mo/Yr)",
+                "Date Employment Ceased (Mo/Yr)",
+                "# of Years Employed",
+                "Reason for Employment Ceased",
+                "Email Address (current faculty only)"
+              ],
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "B",
+          "subsection_name": "FACULTY QUALIFICATIONS",
+          "criteria": [
+            {
+              "criterion_id": "REN-III-B-1",
+              "item_number": "1",
+              "question": "Describe how the school's faculty is sufficient in number to serve the student enrollment and how the instructional staff maintains a satisfactory working relationship with students (i.e., including sufficient time to advise students, grade papers, stay current with the field of training, and fulfill the required contact hours of teaching).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-III-B-2",
+              "item_number": "2",
+              "question": "Explain how the school determines that all faculty members have appropriate training in instructional methods and teaching skills, are able to teach in a manner that permits announced educational objectives to be achieved, and are able to demonstrate a command of theory and practice, contemporary knowledge, and continuing study in their particular field. Does the school have a training program to provide training in instructional methods and teaching skills? If so, describe the program curriculum and explain how the effectiveness of this training program is determined and documented.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_code": "IV",
+      "section_name": "STUDENT RECRUITMENT, ADVERTISING, AND DISCLOSURES",
+      "subsections": [
+        {
+          "subsection_code": "A",
+          "subsection_name": "RECRUITMENT",
+          "criteria": [
+            {
+              "criterion_id": "REN-IV-A-1",
+              "item_number": "1",
+              "question": "Describe the nature and extent of the school's recruitment efforts (as distinct from admissions practices) including the geographical recruitment area, potential areas for improvement, and the forms used for advertising and promotion.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-A-2",
+              "item_number": "2",
+              "question": "How do the school's efforts focus on attracting qualified students rather than simply obtaining enrollments? How is the process designed to describe the school fully and accurately to prospective students? How is the process designed to provide an opportunity for applicants to make a considered enrollment decision without undue pressure?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-A-3",
+              "item_number": "3",
+              "question": "What are the applicable federal and state laws pertaining to student recruitment and how does the school ensure compliance with those requirements?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-A-4",
+              "item_number": "4",
+              "question": "Provide the names, job titles, and position descriptions for all individuals who are engaged in recruitment activities for the school (i.e., representatives, recruiters, surveyors, international third-party, agents, etc.).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-A-5",
+              "item_number": "5",
+              "question": "Describe how the school selects and trains recruiting and admissions personnel; include a position description and sample of training documents.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-A-6",
+              "item_number": "6",
+              "question": "How does the school supervise, monitor, and evaluate the performance of recruiting and admissions personnel to ensure that only ethical practices are used? Describe the method of compensation for all recruitment and admissions personnel by title, explaining the contractual relationship, if any, of each with the school. Attach as an exhibit a sample performance evaluation.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-A-7",
+              "item_number": "7",
+              "question": "What are the school's oversight mechanisms to ensure ethical practices and procedures in the recruitment of students? What is the school's process for ongoing review and evaluation of its recruiting policies and procedures?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-A-8",
+              "item_number": "8",
+              "question": "Attach as an exhibit a copy of the school's code of conduct for all school personnel whose primary responsibilities are to engage in recruiting and admissions functions prior to and during admission and matriculation.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "B",
+          "subsection_name": "ADVERTISING, PROMOTION, STATEMENTS, AND CLAIMS",
+          "criteria": [
+            {
+              "criterion_id": "REN-IV-B-1",
+              "item_number": "1",
+              "question": "What process does the school use to develop and post advertising and other promotional materials or activities? Who approves advertisements and promotional materials?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-B-2",
+              "item_number": "2",
+              "question": "Describe how the school ensures that all advertising, promotional materials, statements, and claims are truthful and accurate.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-IV-B-2-a",
+                  "item_number": "2.a",
+                  "question": "How does the school document the accuracy of statements made in advertising?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-IV-B-2-b",
+                  "item_number": "2.b",
+                  "question": "Does the school use a diminutive name in advertising? If so, please provide it.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-IV-B-3",
+              "item_number": "3",
+              "question": "What measures does the school use to ensure that Employment or Help Wanted advertisements are not used in advertising the school's educational programs?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-B-4",
+              "item_number": "4",
+              "question": "Endorsements, Images, and Publicly Shared Media:",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-IV-B-4-a",
+                  "item_number": "4.a",
+                  "question": "If the school's advertising includes endorsements (testimonials), what is the school's process for obtaining and maintaining documentation of the written consent of the authors? What is the school's process for reviewing endorsements used in advertising to ensure that it is a bona fide expression of the author's opinions, strictly factual, and a portrayal of currently correct conditions or facts?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-IV-B-4-b",
+                  "item_number": "4.b",
+                  "question": "If the school uses student images in school catalogs, literature, or advertising, what is the school's process for obtaining written consent of the subjects?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-IV-B-4-c",
+                  "item_number": "4.c",
+                  "question": "If the school uses publically shared media, what is the school's process to ensure the media originated with the individual and is bona fide, factually and contextually accurate, unadulterated, and a faithful representation of the shared information or images?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-IV-B-5",
+              "item_number": "5",
+              "question": "Describe how does the school determines any potential salary information provided by the school's personnel or advertising accurately portrays the normal range and starting salary in the occupation.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-B-6",
+              "item_number": "6",
+              "question": "How does the school advertise its accredited status and what terminology is used?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "C",
+          "subsection_name": "DISCLOSURES",
+          "criteria": [
+            {
+              "criterion_id": "REN-IV-C-1",
+              "item_number": "1",
+              "question": "Explain the school's process for developing the catalog and enrollment agreement and ensuring that these documents contain all required disclosures and accurately represent the school.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-C-2",
+              "item_number": "2",
+              "question": "Explain how the school ensures that each applicant is provided with a current and complete catalog prior to signing the enrollment agreement.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-C-3",
+              "item_number": "3",
+              "question": "Explain how the school ensures that an enrollment agreement is executed for all enrolled students. When is the enrollment agreement signed by the student and when is it signed by the accepting school official? When does the school provide a copy of the enrollment agreement to the student?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-C-4",
+              "item_number": "4",
+              "question": "Describe the school's process for ensuring that each applicant is fully informed of the rights, responsibilities, and obligations of both the school and the student under the enrollment agreement before it is signed?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-C-5",
+              "item_number": "5",
+              "question": "What is the school's method for disclosure of the graduation, graduate employment rate, and as applicable licensure/certification examination pass rates for each program as last reported to the Commission; how does the method ensure that graduation, graduate employment rate, and as applicable licensure/certification examination pass rates are accurate, not intended to mislead, and includes the school's program population base and time frame upon which each rate is based?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IV-C-6",
+              "item_number": "6",
+              "question": "List any programs required accreditation (institutional or programmatic) and/or approval by a third-party regulatory agency (e.g., state agency, licensing agency, oversight board, national certification entity, etc.), for the purpose of licensure, certification, or employment. What is the school's method for disclosing to students whether such accreditation and/or third-party recognition has been achieved and is in good standing?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_code": "V",
+      "section_name": "ADMISSION POLICIES AND PRACTICES",
+      "subsections": [
+        {
+          "subsection_code": "A",
+          "subsection_name": "GENERAL REQUIREMENTS",
+          "criteria": [
+            {
+              "criterion_id": "REN-V-A-1",
+              "item_number": "1",
+              "question": "Describe the school's admission policies and admission practices (as distinct from recruitment practices). How are the admissions criteria designed to admit only those students who are reasonably capable of successfully completing and benefitting from the training offered and which take into account the nature of the training and education provided and the program's responsibilities and demands? If the school offers hybrid or fully on-line programs, discuss the steps taken to verify that applicants are reasonably capable of successfully completing the training.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-V-A-2",
+              "item_number": "2",
+              "question": "Describe the admission process, including where and when enrollment occurs and how the school determines with reasonable certainty that each person who enrolls is fully informed about the nature of training provided.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-V-A-3",
+              "item_number": "3",
+              "question": "What are the measures the school has in place to ensure the consistent and fair application of the admissions requirements?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-V-A-4",
+              "item_number": "4",
+              "question": "List each admissions requirement and the documentation secured by the school to show that all students meet the school's admissions requirements prior to matriculation.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-V-A-4-c",
+                  "item_number": "4.c",
+                  "question": "What is the school's process for maintaining admissions documentation?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-V-A-4-d",
+                  "item_number": "4.d",
+                  "question": "For distance education/ hybrid programs, how does the school review an applicant's access and technical readiness relative to the school's specific distance education platform/environment?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-V-A-4-e",
+                  "item_number": "4.e",
+                  "question": "How does the school document that applicants rejected did not meet admissions requirements?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-V-A-5",
+              "item_number": "5",
+              "question": "What is the school's process to ensure that documentation for students from foreign countries is translated? How does the school ensure that the document is certified to be at least the equivalent of a U.S. high school diploma?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-V-A-6",
+              "item_number": "6",
+              "question": "What is the school's policy for the rare instances when students may not be able to provide documentation of a high school diploma required by a school's admissions criteria due to issues beyond their control (e.g., loss of records due to fire or flood, inability to obtain records, home schooled students, etc.)?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-V-A-7",
+              "item_number": "7",
+              "question": "Describe the school's process to ensure that the school neither denies admission nor discriminates against students enrolled at the school on the basis of race, religion, color, gender, sexual orientation, genetic information, age, disability, or national origin. Has the school provided reasonably accommodation to applicants and students with disabilities to the extent required by applicable law?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-V-A-8",
+              "item_number": "8",
+              "question": "Describe any improvements in the school's admission policies and practices implemented during the school's last term of accreditation or identified for implementation in the near future.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "B",
+          "subsection_name": "NON-DEGREE PROGRAMS",
+          "criteria": [
+            {
+              "criterion_id": "REN-V-B-1",
+              "item_number": "1",
+              "question": "If the school admits ability-to-benefit (\"ATB\") students (i.e., students admitted without a high school graduation or the equivalent), address the following:",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-V-B-1-a",
+                  "item_number": "1.a",
+                  "question": "What tests are used to determine the applicant's ability to benefit from the training offered, prior to matriculation?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-V-B-1-b",
+                  "item_number": "1.b",
+                  "question": "If the school uses tests that are not on the U.S. Department of Education list of approved tests, attach an evaluation and provide a rationale for selecting these tests and the credentials of the independent third party that made this determination.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-V-B-1-c",
+                  "item_number": "1.c",
+                  "question": "Describe the school's process for ATB testing and identify individuals responsible for proctoring and scoring the test.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-V-B-2",
+              "item_number": "2",
+              "question": "How does the school determine the effectiveness of its admission requirements related to ability-to-benefit students? What periodic studies have been conducted for this purpose and what have been the results of those studies?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-V-B-3",
+              "item_number": "3",
+              "question": "Complete the chart below and indicate, by program, how many of the students currently enrolled were admitted on the ATB basis. ## Program Title",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "D",
+          "subsection_name": "DEGREE PROGRAMS -- GRADUATE",
+          "criteria": [
+            {
+              "criterion_id": "REN-V-D-1",
+              "item_number": "1",
+              "question": "How does the school ensure that all students admitted into a master's degree program meet admissions criteria, including possession of an earned baccalaureate degree from an institution of higher education that is accredited by an accreditation agency that is recognized by the U.S. Department of Education or other similar recognition?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-V-D-2",
+              "item_number": "2",
+              "question": "If the school requires standardized or national examinations or other entrance tests for admission into its graduate level programs or courses, how does the school disclose the type and nature of examination and the acceptable score and/or range of scores applicants must receive to be admitted?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "E",
+          "subsection_name": "ESL COURSES",
+          "criteria": [
+            {
+              "criterion_id": "REN-V-E-1",
+              "item_number": "1",
+              "question": "How does the school ensure that students enrolled in ESL courses meet all other admission requirements applicable to students enrolled in the school's career or occupational programs",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-V-E-2",
+              "item_number": "2",
+              "question": "How does the school ensure that adequate translation resources must be available to assist students in their comprehension of the process and all program requirements?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-V-E-3",
+              "item_number": "3",
+              "question": "List admission requirements for all students entering ESL courses offered by the school.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-V-E-4",
+              "item_number": "4",
+              "question": "How does the school determine (and document) that, with appropriate teaching, the students enrolled in front-loaded and integrated ESL courses can qualify for specialized training or continue their occupational education?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-V-E-5",
+              "item_number": "5",
+              "question": "List the faculty teaching ESL courses and demonstrate that they have appropriate experience and educational background including state or equivalent credentials in Teaching of English to Speakers of Other Languages (TESOL). * *Instructor Name",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_code": "VI",
+      "section_name": "STUDENT SERVICES",
+      "subsections": [
+        {
+          "subsection_code": "A",
+          "subsection_name": "STUDENT SERVICES",
+          "criteria": [
+            {
+              "criterion_id": "REN-VI-A-1",
+              "item_number": "1",
+              "question": "Describe the school's student services efforts (i.e. academic and non-academic):",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-VI-A-1-a",
+                  "item_number": "1.a",
+                  "question": "Describe how the school remains attentive to students' needs as a means to support student achievement outcomes.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-VI-A-1-b",
+                  "item_number": "1.b",
+                  "question": "Describe school's policies and procedures for addressing student services, to include the services offered.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-VI-A-1-c",
+                  "item_number": "1.c",
+                  "question": "Describe how the school makes students aware of such services.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-VI-A-2",
+              "item_number": "2",
+              "question": "Describe how the school maintains adequate student services and resources that support its students in maintaining satisfactory progress, achieving successful educational and student achievement outcomes (i.e., knowledge and skill attainment, retention, graduation, and employment), and making informed decisions concerning training and employment.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VI-A-3",
+              "item_number": "3",
+              "question": "Describe how the school determined the adequacy of the student services initiatives in consideration of the number of programs, size and mis of the student body, and the necessary resources and structure necessary to respond to individual student needs.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-VI-A-3-a",
+                  "item_number": "3.a",
+                  "question": "Provide a description of the personnel responsible for coordinating the school's student services program, including a discussion of professional and educational qualifications.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-VI-A-3-b",
+                  "item_number": "3.b",
+                  "question": "Provide a description of the areas covered by the school's student services (e.g. relevant coping skills, student development, student safety and well-being, etc.)",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-VI-A-3-c",
+                  "item_number": "3.c",
+                  "question": "How does the school make counseling services available to students when warranted and necessary based on the student population and circumstances?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-VI-A-4",
+              "item_number": "4",
+              "question": "Describe how the school maintains comprehensive documentation of student advising sessions.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VI-A-5",
+              "item_number": "5",
+              "question": "Describe how the school continually monitors and addresses student satisfaction and student needs for services as a means to support students in achieving successful outcomes. Complete the following chart to show the respective student services available to students including the designated school personnel responsible for these areas (mark all that apply): Staff / Position Relevant coping skills General Higher. Ed. Development Student retention strategies Academic Advising Testing Services Tutoring Services Attendance Monitoring Leave s of Absences Graduate Employment Assistance Housing Information Transportation Information Child Care Information Other \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610",
+              "answer_type": "table_rows",
+              "required": true,
+              "table_columns": [
+                "Staff / Position",
+                "Relevant Coping Skills",
+                "General Higher Ed. Development",
+                "Student Retention Strategies",
+                "Academic Advising",
+                "Testing Services",
+                "Tutoring Services",
+                "Attendance Monitoring",
+                "Leaves of Absence",
+                "Graduate Employment Assistance",
+                "Housing Information",
+                "Transportation Information",
+                "Child Care Information",
+                "Other"
+              ],
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "B",
+          "subsection_name": "STUDENT RECORDS",
+          "criteria": [
+            {
+              "criterion_id": "REN-VI-B-1",
+              "item_number": "1",
+              "question": "Describe the school's process for maintaining an educational record for all currently enrolled students that consists of all admissions; transcript (see #2 below) and academic progress reports; records related to tuition and fee payments, refunds, and financial aid; and information upon which a student's initial and continued enrollment is based for a minimum of five years post the student's graduation, withdrawal, or termination date.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VI-B-2",
+              "item_number": "2",
+              "question": "Describe how permanent official transcripts for all current and formerly enrolled students are securely maintained indefinitely. Provide as an exhibit a copy of the school's official transcript for a recent graduate (name may be redacted) *(Note: The transcript must include the student's name and unique identifier; the name and address of the school; the program of study; the name and date/term of courses taken; the clock or credit hours and grades earned for each course; any credits accepted for transfer; the cumulative grade point average; the date of program entry; and the date of graduation, termination or withdrawal*.)",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VI-B-3",
+              "item_number": "3",
+              "question": "What is the school's process for making transcripts available to students upon request and in accordance with the school's policies?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VI-B-4",
+              "item_number": "4",
+              "question": "Describe the school's process for securely maintaining and protecting records (physical or electronic) against damage or loss (e.g., fire, water, theft, tampering, etc.).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VI-B-5",
+              "item_number": "5",
+              "question": "Describe how the school maintains student records in in accordance with state or federal regulation or law, if these require additional information or longer retention periods than previously described.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "C",
+          "subsection_name": "GRADUATE EMPLOYMENT ASSISTANCE AND RECORDS",
+          "criteria": [
+            {
+              "criterion_id": "REN-VI-C-1",
+              "item_number": "1",
+              "question": "Describe the extent and nature of employment assistance made available to students.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VI-C-2",
+              "item_number": "2",
+              "question": "Describe the school's process for classifying graduates as employed in field in accordance with the Guidelines for Employment Classification outlined in *Appendix VII of the Substantive Standards, Standards of Accreditation*, including: - How does the school determine that the graduate's employment is appropriate and reasonable based on the educational objectives of the program? - How does the school determine that the employment is for a reasonable period of time, is based on program objectives, and can be considered sustainable? - How does the school determine that the employment is directly related to the program from which the individual graduated, aligns with a majority of the educational and training objectives of the program, and is a paid position?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VI-C-3",
+              "item_number": "3",
+              "question": "Describe how the school verifies each employment classification and maintains verifiable records, including:",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-VI-C-3-a",
+                  "item_number": "3.a",
+                  "question": "Regular Employment: How does the school secure written documentation from the employer or graduate verifying the employment and that the employment is related to the student's program of study at the school? Provide as an exhibit a sample employment record demonstrating that the requisite elements are included in the school's records. In cases where the school cannot obtain written documentation from the employer or graduate, describe how the school shows that diligent efforts have been made to secure such written documentation, and how the school's employment verification records include a) the graduate's and employer's name and contact information, b) a signature of school staff attesting to verbal employment verification with both the employer *and* the graduate, and c) the date(s) of verification. Provide as an exhibit a sample employment record demonstrating that the requisite elements are included in the school's records.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-VI-C-3-b",
+                  "item_number": "3.b",
+                  "question": "Self-Employment - How does the school secure written documentation from the self-employed graduate verifying that the employment is valid including, at a minimum, a statement signed by the graduate which includes the following: - The graduate's name and contact information; - An attestation that the self-employment is aligned with the individual's employment goals, is vocational, and is based on and related to the education and training received; - An attestation that the graduate is earning training-related income; and - An attestation that any required licensure for employment has been achieved, if applicable - (e.g., this would not apply in cases where the state or regulatory entity would allow an individual to work under a licensed practitioner before obtaining licensure). Provide as an exhibit a sample employment record demonstrating that the requisite elements are included in the school's records.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-VI-C-3-c",
+                  "item_number": "3.c",
+                  "question": "Career Advancement - How does the school secure written documentation from the employer or the graduate confirming that the training allowed the graduate to maintain the employment position due to the training provided by the school or that the training supported the graduate's ability to be eligible or qualified for advancement due to the training provided by the school. Provide as an exhibit a sample employment record demonstrating that the requisite elements are included in the school's records.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-VI-C-4",
+              "item_number": "4",
+              "question": "If public notices (e.g., of graduate employment rates) are used, explain how they are used by the school, and verify through attached copies of the notices that they indicate the school's graduation population base and time frame upon which those (graduation and/or employment rates, rather than \"figures\") are based. (*Note: For example, if a school advertises an 80% employment rate, this would need to be accompanied by information such as: of 100 graduates in 2011, 80 gained employment in their field of study*).",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "D",
+          "subsection_name": "STUDENT COMPLAINTS",
+          "criteria": [
+            {
+              "criterion_id": "REN-VI-D-1",
+              "item_number": "1",
+              "question": "Describe the school's complaint policy and procedure and how students are informed of these procedures to include the school official responsible for the compliant process",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VI-D-2",
+              "item_number": "2",
+              "question": "Explain how the school's fully and fairly reviews each compliant and how the status of the complaint is communicated to the student in writing.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VI-D-3",
+              "item_number": "3",
+              "question": "Explain how the school's student complaint procedure has been effective during the last term of accreditation. If applicable, describe how it has been updated in that timeframe.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VI-D-4",
+              "item_number": "4",
+              "question": "Provide a summary of student complaints over the last five years that were submitted through the school's student complaint policy, using the following chart: Complainant's Complaint Action Taken by the Status Name School ----------------- ----------------- --------------------- --------------",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_code": "VII",
+      "section_name": "STUDENT LEARNING, ASSESSMENT, PROGRESS, AND ACHIEVEMENT",
+      "subsections": [
+        {
+          "subsection_code": "A",
+          "subsection_name": "STUDENT LEARNING, ASSESSMENT, AND SATISFACTORY PROGRESS",
+          "criteria": [
+            {
+              "criterion_id": "REN-VII-A-1",
+              "item_number": "1",
+              "question": "Describe how the school promotes academic integrity and has policies and controls to discourage academic dishonesty (i.e., cheating, plagiarism, etc.). How does the school clearly communicate the consequences of such behavior?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-A-2",
+              "item_number": "2",
+              "question": "Describe how the school reports academic progress to students at regular intervals and evaluates the minimum grade point average that students must attain at those intervals. What is the regular interval the school uses?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-A-3",
+              "item_number": "3",
+              "question": "Describe the school's satisfactory academic progress policy. How is the policy appropriate and effective to attain the objectives of each program?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-A-4",
+              "item_number": "4",
+              "question": "Describe how the school's attendance policy promotes sufficient levels of student attendance such that the required knowledge, skills, and competencies can be achieved.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-A-5",
+              "item_number": "5",
+              "question": "Describe the school's probation and termination policies and procedures. How does the school notify and warn a student in writing that continued unsatisfactory academic progress, failure to meet attendance requirements, or failure to adhere to the school's conduct policies will result in probation or termination and document that the student received the notification or that the school made an attempt to notify the student of the warning?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "B",
+          "subsection_name": "STUDENT ACHIEVEMENT",
+          "criteria": [
+            {
+              "criterion_id": "REN-VII-B-1",
+              "item_number": "1",
+              "question": "Describe how the school assesses educational quality, institutional effectiveness, and student achievement taking into account the rates at which students graduate from each training program, attain employment in a training related field, and pass licensure/certification exams required for employment, as well as other factors that are reasonably related to student achievement. ------------------------- ------------------------- -------------- ------------------ -----------------",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-B-2",
+              "item_number": "2",
+              "question": "Describe how the school follows up with graduates after they are placed in jobs. How does this program help to verify acceptance of the graduates in the field of preparation?",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-B-3",
+              "item_number": "3",
+              "question": "Provide as an exhibit the Graduation and Employment Chart(s) as submitted in the school's most recent Annual Report to the Commission.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-B-4",
+              "item_number": "4",
+              "question": "Complete the following summary chart of student achievement outcomes for each program or program length offered using the data submitted above: Program Title Length in Months Graduation Employment Rate Rate",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-B-5",
+              "item_number": "5",
+              "question": "List each program for which certification or licensure is required in order for graduates to be eligible for employment in the field for which training was provided. ------------------------- ---------- ------------------------- ------------ Program Title Length Exam Title Student in Pass Rate Months",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-B-6",
+              "item_number": "6",
+              "question": "Describe the certification or licensure requirements (including who administers the certification/licensing examinations, how often tests are given, etc.) for each program listed above.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "C",
+          "subsection_name": "Results of Third-Party Verification of Employment Data",
+          "criteria": [
+            {
+              "criterion_id": "REN-VII-C-1",
+              "item_number": "1",
+              "question": "The following chart completed with the aggregate institutional results across all programs: Independent Third Party Initial Employment Verification Reported Institutional Rates Annual Report Year Total number of students sampled Verified as Correct \\*Students classified as Graduates - Employed in Field across all programs for Annual Report year Placements Verified by a Different Independent Third-Party\\* ----------------------------------- ----------------------------------- Third-Party Company Name Number of Graduates Verified \\* Graduates that were unable to be verified by the school's chosen vendor but were verified by a different third-party company like \"The Work Number.\"",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-C-2",
+              "item_number": "2",
+              "question": "An attestation from the third-party vender regarding the following disclosures/past records of integrity: DISCLOSURES SELECT PERTAINING TO ONE () THIRD-PARTY VENDOR: --------------- --------------------------------------------------- ---------- -------- YES NO",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-C-1-dup2",
+              "item_number": "1",
+              "question": "Has any owner, employee, or affiliated contractor \u2610 \u2610 been directly or indirectly employed or affiliated with any school which has lost or been denied accreditation by any accrediting agency? If the answer is YES, please attach a statement which details the facts and circumstances surrounding that school's loss or denial of accreditation.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-C-2-dup2",
+              "item_number": "2",
+              "question": "Has any owner, employee, or affiliated contractor \u2610 \u2610 been directly or indirectly employed or affiliated with any school that has closed or entered into bankruptcy? If the answer is YES, please attach a statement which details the facts and circumstances surrounding that school's closure, bankruptcy or both as applicable.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-C-3",
+              "item_number": "3",
+              "question": "Has any owner, employee, or affiliated contractor \u2610 \u2610 been directly or indirectly employed or affiliated with any school that has lost or been denied eligibility to participate in Federal Student Financial Aid (Title IV) programs? If the answer is YES, please attach a statement which details the facts and circumstances surrounding the loss or denial of Title IV eligibility.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-C-4",
+              "item_number": "4",
+              "question": "Is any action pending (e.g. court action, audit, \u2610 \u2610 inquiry, review, administrative action), or has action been taken, by any court or administrative body (e.g. federal or state court, grand jury, special investigator, U.S. Department of Education, or any state or federal regulatory or law enforcement agency) with regard to any owner, employee, or affiliated contractor or with regard to any institution with which any owner, employee, or affiliated contractor has previously been affiliated? If the answer is YES, please attach a statement which gives full disclosure of the person(s) and the matters involved. Include a statement of the facts and circumstances surrounding the action identifying the owner, employee, or affiliated contractor and the school involved. If the matter is not yet final, please describe the procedural status of the matter (i.e., still under investigation, preliminary decision under appeal, etc.) and the position taken by the owner, employee, or affiliated contractor involved. If the matter is final, provide a copy of the final action documentation.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-C-5",
+              "item_number": "5",
+              "question": "Has any owner, employee, or affiliated contractor \u2610 \u2610 been employed at or affiliated with a school where either that individual or the school has been charged or indicted in a civil or criminal forum or proceeding alleging fraud, misappropriation, or any criminal act? If the answer is [YES]{.smallcaps}, please attach a statement which gives full disclosure of the person(s) and the matters involved. Include a statement of the facts and circumstances surrounding the action identifying the owner, employee, or affiliated contractor and the school which is involved. If the matter is not yet final, please describe the procedural status of the matter (i.e., still under investigation, preliminary decision under appeal, etc.) and the position taken by the owner, employee, or affiliated contractor involved. If the matter is final, provide a copy of the final action documentation.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-C-3-dup2",
+              "item_number": "3",
+              "question": "The vendor must provide a narrative explanation for YES answers to the questions above.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-C-4-dup2",
+              "item_number": "4",
+              "question": "If the third-party answered YES to any of the items above in this section, the school must provide an explanation as to why the school chose this vendor despite the vendor's disclosures and past records. The school must also articulate how this vendor can serve as a reliable source to verify the accuracy of the school's data.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VII-C-5-dup2",
+              "item_number": "5",
+              "question": "Explanation of training on ACCSC's methodology and definitions for counting students as verified as correct, verified as different, verified as not correct, or not verified provided to each person directly responsible for executing the independent third-party verifications.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_code": "VIII",
+      "section_name": "SEPARATE FACILITIES",
+      "subsections": [
+        {
+          "subsection_code": "A",
+          "subsection_name": "BRANCH CAMPUS",
+          "criteria": [
+            {
+              "criterion_id": "REN-VIII-A-1",
+              "item_number": "1",
+              "question": "List the name and address of each branch campus and the educational or training program(s) offered at each branch campus.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-A-2",
+              "item_number": "2",
+              "question": "For each branch, describe how that campus is geographically apart from the main school, permanent in nature, has its own faculty and administrative or supervisory organization, and provides for all required educational resources and student services (e.g., advising, testing, library resources, financial aid, employment assistance, etc.).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-A-3",
+              "item_number": "3",
+              "question": "Describe the structure and process for management and oversight of the branch campus and how this system has been effective in ensuring the school meets its objectives, fulfills its obligations to students, and meets or exceeds accrediting standards on an ongoing basis. Identify the ownership and management entity that controls the main school and the branch.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-A-4",
+              "item_number": "4",
+              "question": "List the individuals responsible for management of the school (including campus-based and corporate oversight) and provide a detailed description of how each member of the management team is qualified for his or her particular role, including education, training, experience, and demonstrated ability to lead and manage a post-secondary educational institution. Provide as an exhibit an organizational chart depicting the management structure.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-A-5",
+              "item_number": "5",
+              "question": "If a branch campus operates under a different name than the main school, demonstrate that all applicable state requirements have been met, and that each school's catalog and enrollment agreement clearly define the relationship between a branch location and its main school.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-A-6",
+              "item_number": "6",
+              "question": "Describe how the main school has sufficient financial and managerial resources to operate and supervise its separate facilities.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "B",
+          "subsection_name": "SATELLITE LOCATION",
+          "criteria": [
+            {
+              "criterion_id": "REN-VIII-B-1",
+              "item_number": "1",
+              "question": "List the name and address of each satellite location and the educational or training program(s) offered at each satellite location.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-B-2",
+              "item_number": "2",
+              "question": "Provide the distance, both in miles and travel time, from the satellite location to the main school or branch. Explain how this distance is a reasonable commuting distance.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-B-3",
+              "item_number": "3",
+              "question": "Describe how the main school or branch manages each satellite location. Demonstrate that the school has sufficient financial and managerial resources to operate and supervise its satellite location(s).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-B-4",
+              "item_number": "4",
+              "question": "Explain how the school supervises and provides services to staff and students at all satellite location(s). Describe how students attending each satellite location have access to educational and support services that are equivalent to those offered to students at the oversight school.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-B-5",
+              "item_number": "5",
+              "question": "List any program if more than 50% of any one program is offered at a satellite location and whether the school submits a separate Graduation and Employment Chart for that program for the students attending the satellite location.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-B-6",
+              "item_number": "6",
+              "question": "Demonstrate that each satellite location bears the same name as the main school or branch, and that the relationship between each satellite location and its branch or main school oversight entity is identified in all advertising and publications.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "C",
+          "subsection_name": "DISTANCE EDUCATION FACILITY",
+          "criteria": [
+            {
+              "criterion_id": "REN-VIII-C-1",
+              "item_number": "1",
+              "question": "List the name and address of each distance education facility and the educational or training program(s) offered at each distance education facility.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-C-2",
+              "item_number": "2",
+              "question": "Provide as an exhibit documentation showing that each distance education facility is licensed by the appropriate state regulatory agency(ies).",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-C-3",
+              "item_number": "3",
+              "question": "Describe how the main school or branch manages each distance education facility.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-C-4",
+              "item_number": "4",
+              "question": "Describe how the main school or branch has sufficient financial and managerial resources to operate and supervise its distance education location(s).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-C-5",
+              "item_number": "5",
+              "question": "Explain how the school supervises and provides services to staff and students at all distance education location(s). Describe how students have access to educational and support services that are equivalent to those offered to students at the oversight school.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-VIII-C-6",
+              "item_number": "6",
+              "question": "Demonstrate that each distance education location bears the same name as the main school or branch, and that the relationship between each distance education location and its branch or main school oversight entity is identified in all advertising and publications.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_code": "IX",
+      "section_name": "DISTANCE EDUCATION",
+      "subsections": [
+        {
+          "subsection_code": "A",
+          "subsection_name": "GENERAL DISTANCE EDUCATION REQUIREMENTS",
+          "criteria": [
+            {
+              "criterion_id": "REN-IX-A-1",
+              "item_number": "1",
+              "question": "Describe how the school ensures that only appropriate programs or courses of study are taught using distance education methodologies (the delivery of educational materials via technology).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-A-2",
+              "item_number": "2",
+              "question": "Demonstrate that there are: i\\. appropriate admissions criteria; ii\\. assessment measures in place for student progress and student achievement; and iii\\. appropriate resources and services are available to support student success.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-A-3",
+              "item_number": "3",
+              "question": "Demonstrate that the school obtained all necessary authorizations or approval(s) as required by applicable state oversight agencies where the school has enrollments or intends to enroll. If a state does not require approval, provide evident to this effect.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "B",
+          "subsection_name": "MANAGEMENT AND ADMINISTRATION OPERATIONS",
+          "criteria": [
+            {
+              "criterion_id": "REN-IX-B-1",
+              "item_number": "1",
+              "question": "Describe how the school's distance education administrator or team of administrators are qualified to knowledgeably and effectively oversee the school's distance education program(s)/course(s) of study, and how they ensure that these program(s)/course(s) of study meet the objectives and the mission of the school.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-B-2",
+              "item_number": "2",
+              "question": "Provide as an exhibit evidence that the school's distance education administrator or team of administrators participate in ongoing distance education development and training activities.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-B-3",
+              "item_number": "3",
+              "question": "Describe how the school ensures that it has the appropriate management, administrative capacity, and infrastructure to support growth in each distance education program.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-B-4",
+              "item_number": "4",
+              "question": "Provide as an exhibit the operational policies and procedures for distance education. What is the process for developing, reviewing, and updating the operational policies and procedures relative to distance education? Describe how the school ensures that policies and procedures are appropriate to support the programs or courses of study.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-B-5",
+              "item_number": "5",
+              "question": "Explain how the school retains responsibility for the quality of the program(s)/course(s) of study offered through distance education methods and the achievement of expected and acceptable outcomes, irrespective of any contractual arrangements, partnerships, or consortia entered into with third parties for the provision of components of a distance education program or course of study.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-B-6",
+              "item_number": "6",
+              "question": "Provide as an exhibit the school's institutional assessment and improvement activities for distance education, which outlines, at a minimum, the following:",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-IX-B-6-a",
+                  "item_number": "6.a",
+                  "question": "How the school ensures that sufficient facilities, equipment, technology, and other resources and infrastructure associated with distance education are appropriate to the subject matter of the program or courses of study, and are integrated in the long-term institutional assessment and improvement plan and budget of the school; and",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-IX-B-6-b",
+                  "item_number": "6.b",
+                  "question": "How the school reviews and maintains responsibility for the currency and quality of all distance education components as part of its institutional assessment and improvement activities.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            },
+            {
+              "criterion_id": "REN-IX-B-7",
+              "item_number": "7",
+              "question": "Describe the school's authentication policies and processes regarding student verification in a distance education course or program as follows:",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-IX-B-7-a",
+                  "item_number": "7.a",
+                  "question": "How does the school verify that the student who registers in a distance education course or program is the same student who participates in and completes the course or program? How does the school verify the identity of the student who participates in class or coursework? What methods (e.g. a secure login and pass code, proctored examinations, new or other technologies and practices that are effective in verifying student identity) does the school use to ensure that only registered students can complete the required coursework and be awarded academic credit?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-IX-B-7-b",
+                  "item_number": "7.b",
+                  "question": "What processes does the school have to protect privacy and notify students of any projected additional student charges associated with the verification of student identity at the time of registration or enrollment?",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "subsection_code": "C",
+          "subsection_name": "OBJECTIVES AND STUDENT ACHIEVEMENT",
+          "criteria": [
+            {
+              "criterion_id": "REN-IX-C-1",
+              "item_number": "1",
+              "question": "Describe the outcomes expected from the distance education program(s)/course(s) of study. (Specify the expected knowledge, skills, and competency levels that students will achieve in the distance education program or course of study). Explain how the objectives of distance education program(s)/course(s) of study are consistent with the mission of the school and its educational and training objectives.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-C-2",
+              "item_number": "2",
+              "question": "Describe how the program(s)/course(s) of study are appropriate for delivery through distance education methods.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-C-3",
+              "item_number": "3",
+              "question": "Describe how the objectives of distance education program(s)/course(s) of study are readily available for student consideration.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-C-4",
+              "item_number": "4",
+              "question": "Explain how the school facilitates the delivery of course content such that students may reasonably be expected to achieve the learning outcomes.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-C-5",
+              "item_number": "5",
+              "question": "Explain how the school assesses student learning and achievement outcomes.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "D",
+          "subsection_name": "PROGRAMS, CURRICULA, AND RESOURCES",
+          "criteria": [
+            {
+              "criterion_id": "REN-IX-D-1",
+              "item_number": "1",
+              "question": "Describe how the length of each distance education program or course of study is appropriate to achieve the specified objectives and outcomes.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-D-2",
+              "item_number": "2",
+              "question": "Explain and describe the method or methods of delivery (i.e., asynchronous electronic media, synchronous electronic media, etc.) utilized for each distance education program or course of study.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-D-3",
+              "item_number": "3",
+              "question": "Explain how each distance education program or course of study provides for timely and meaningful interaction between students and faculty, and among students.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-D-4",
+              "item_number": "4",
+              "question": "Describe the resources available to support the distance education program(s)/course(s) of study and explain how the resources are sufficient, current, comprehensive, appropriate to the subject matter, and available to students.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-D-5",
+              "item_number": "5",
+              "question": "Provide as an exhibit a copy of the school's policies on ownership of instructional materials and protection of copyright. Describe how the school adheres to these policies.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-D-6",
+              "item_number": "6",
+              "question": "Learning resource system:",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": [
+                {
+                  "criterion_id": "REN-IX-D-6-a",
+                  "item_number": "6.a",
+                  "question": "Describe how the learning resource system for distance education program(s)/course(s) of study meets all necessary requirements outlined in *Section II (A)(7), Substantive Standards, Standards of Accreditation* and be available in an online format.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-IX-D-6-b",
+                  "item_number": "6.b",
+                  "question": "Explain how students will have access to learning resources equivalent to those available to students in residential programs at the school.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-IX-D-6-c",
+                  "item_number": "6.c",
+                  "question": "Describe the training and support services that the school provides students to facilitate access to learning resource materials.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                },
+                {
+                  "criterion_id": "REN-IX-D-6-d",
+                  "item_number": "6.d",
+                  "question": "Describe how the school evaluates the adequacy and accessibility of the resources and services on an ongoing basis.",
+                  "answer_type": "narrative",
+                  "required": true,
+                  "sub_criteria": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "subsection_code": "E",
+          "subsection_name": "CATALOG AND ADVERTISING",
+          "criteria": [
+            {
+              "criterion_id": "REN-IX-E-1",
+              "item_number": "1",
+              "question": "Describe how the catalog contains a description or summary of the delivery system, the prerequisites for participation, expected learning outcomes, graduation requirements, student services, technology and equipment requirements, and any other requirements.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-E-2",
+              "item_number": "2",
+              "question": "Describe how the school recruits students for, advertises for, and promotes the distance education program(s)/course(s) of study.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-E-3",
+              "item_number": "3",
+              "question": "Provide as an exhibit a copy of the advertisements and promotional materials used for the distance education program(s)/course(s) of study.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "F",
+          "subsection_name": "FACULTY",
+          "criteria": [
+            {
+              "criterion_id": "REN-IX-F-1",
+              "item_number": "1",
+              "question": "List the faculty members who teach in each distance education program or course of study. Include on the list a summary of the qualifications, credentials, and distance education teaching experience of each faculty member listed. Describe the school's hiring criteria for faculty who teach using distance education methods (see *Section III (B), Substantive Standards, Standards of Accreditation).*",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-F-2",
+              "item_number": "2",
+              "question": "Describe how the school provides orientation and training for faculty who teach using distance education methods. Explain how this orientation addresses teaching skills and instructional methods in a distance education environment.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-F-3",
+              "item_number": "3",
+              "question": "Provide as an exhibit a copy of the policies, measures, and procedures the school uses to evaluate the performance and resource needs of faculty members in a distance education program(s)/course(s) of study. Explain how the school assesses faculty effectiveness in distance education program(s)/course(s) of study.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-F-4",
+              "item_number": "4",
+              "question": "Provide as an exhibit a copy of the school's policies governing faculty, and explain how these policies address teaching load (inclusive of residential and distance education), class size, time needed for course development, and the sharing of instructional responsibilities that allow for effective teaching in a distance education environment. Describe how the school ensures that faculty and staff respond in a timely manner to student questions and concerns, both academic and administrative.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-F-5",
+              "item_number": "5",
+              "question": "Explain how the school ensures that faculty members provide opportunities and means for timely and meaningful interaction with students that is appropriate to the distance education environment.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-F-6",
+              "item_number": "6",
+              "question": "If the distance education program(s)/course(s) of study include(s) an externship, provide as an exhibit the written training plan and goals for students that specify the particular application and experiences that are to be secured during the externship.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-F-7",
+              "item_number": "7",
+              "question": "Provide the information for the designated school employee responsible for the supervision of the externship for distance education students (if applicable). Describe how this designated school employee has appropriate qualifications (see *Section II (A)(6),* *Substantive Standards, Standards of Accreditation*).",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "G",
+          "subsection_name": "STUDENT SERVICES",
+          "criteria": [
+            {
+              "criterion_id": "REN-IX-G-1",
+              "item_number": "1",
+              "question": "Provide as an exhibit a copy of the school's written policies and procedures which address student services for those students enrolled in the distance education program(s)/course(s) of study. Describe the resources that are available to support the student services provided by the school.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-G-2",
+              "item_number": "2",
+              "question": "Explain how the school's student services are available to students enrolled in distance education program(s)/course(s) of study.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-G-3",
+              "item_number": "3",
+              "question": "Describe how the school ensures adequate supervision of its student services for students enrolled in a distance education program(s)/course(s) of study.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-G-4",
+              "item_number": "4",
+              "question": "Describe the school's orientation process for students enrolled in a distance education program(s)/course(s) of study. Provide as an exhibit a copy of the school's orientation materials for students enrolled in a distance education program(s)/course(s) of study.",
+              "answer_type": "exhibit",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-G-5",
+              "item_number": "5",
+              "question": "Explain how the school maintains records of attendance and satisfactory academic progress.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        },
+        {
+          "subsection_code": "H",
+          "subsection_name": "DISTANCE EDUCATION FACILITY",
+          "criteria": [
+            {
+              "criterion_id": "REN-IX-H-1",
+              "item_number": "1",
+              "question": "Describe the ownership structure of the Distance Education Facility.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            },
+            {
+              "criterion_id": "REN-IX-H-2",
+              "item_number": "2",
+              "question": "Describe how the oversight of the facility includes proper management, control, and supervision.",
+              "answer_type": "narrative",
+              "required": true,
+              "table_columns": null,
+              "sub_criteria": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+# app/models.py
 from datetime import datetime, date
 from app import db
 from flask_login import UserMixin
@@ -16,6 +17,7 @@ class Users(db.Model, UserMixin):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     portfolios = db.relationship("Portfolio", backref="owner", lazy=True)
+    application_memberships = db.relationship("ApplicationMember", backref="user", cascade="all, delete-orphan", lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -74,11 +76,24 @@ class Application(db.Model):
     portfolio_id = db.Column(db.Integer, db.ForeignKey("portfolios.id"), nullable=False)
     standard_pack_id = db.Column(db.String(100), db.ForeignKey("standard_packs.id"), nullable=False)
     status = db.Column(db.String(50), nullable=False, default="draft")
+    due_date = db.Column(db.Date, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     responses = db.relationship("Response", backref="application", cascade="all, delete-orphan", lazy=True)
     status_history = db.relationship("StatusHistory", backref="application", cascade="all, delete-orphan", lazy=True)
+    members = db.relationship("ApplicationMember", backref="application", cascade="all, delete-orphan", lazy=True)
+
+class ApplicationMember(db.Model):
+    __tablename__ = "application_members"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    application_id = db.Column(db.Integer, db.ForeignKey("applications.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    role = db.Column(db.String(50), nullable=False, default="editor")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    __table_args__ = (
+        db.UniqueConstraint("application_id", "user_id", name="uq_application_member"),
+    )
 
 class Response(db.Model):
     __tablename__ = "responses"
@@ -96,6 +111,17 @@ class Response(db.Model):
     )
 
     evidence_documents = db.relationship("EvidenceDocument", backref="response", cascade="all, delete-orphan", lazy=True)
+    table_rows = db.relationship("TableRowData", backref="response", cascade="all, delete-orphan", lazy=True)
+
+class TableRowData(db.Model):
+    __tablename__ = "table_row_data"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    response_id = db.Column(db.Integer, db.ForeignKey("responses.id"), nullable=False)
+    row_index = db.Column(db.Integer, nullable=False, default=0)
+    row_data = db.Column(JSONType, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class EvidenceDocument(db.Model):
     __tablename__ = "evidence_documents"

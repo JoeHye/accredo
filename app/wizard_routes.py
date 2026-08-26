@@ -1,17 +1,25 @@
+# app/wizard_routes.py
 import os
 import glob
 import logging
+import difflib
 from datetime import datetime
 from flask import Blueprint, jsonify, request, render_template, send_file
 from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
 from app import db
-from app.models import Application, StandardPack, Criterion, Response, EvidenceDocument, Portfolio
+from app.models import Application, StandardPack, Criterion, Response, EvidenceDocument, Portfolio, TableRowData, ApplicationMember, Users
 from app.report_generator import generate_report
+
+import vertexai
+from vertexai.generative_models import GenerativeModel
+from google.api_core.exceptions import GoogleAPIError
 
 logger = logging.getLogger(__name__)
 
 wizard_bp = Blueprint("wizard", __name__, template_folder="templates", static_folder="static")
+
+GEMINI_MODEL_NAME = "gemini-2.0-flash-001"
 
 def get_report_output_dir():
     report_dir = os.environ.get("REPORT_OUTPUT_DIR")
@@ -27,7 +35,11 @@ def verify_application_ownership(application_id):
         app_record = Application.query.get(application_id)
         if not app_record:
             return None, jsonify({"error": "Application not found"}), 404
-        if not app_record.portfolio or app_record.portfolio.owner_user_id != current_user.id:
+        is_owner = app_record.portfolio and app_record.portfolio.owner_user_id == current_user.id
+        is_member = ApplicationMember.query.filter_by(
+            application_id=application_id, user_id=current_user.id
+        ).first() is not None
+        if not is_owner and not is_member:
             return None, jsonify({"error": "Forbidden", "message": "You do not have access to this application"}), 403
         return app_record, None, None
     except Exception as e:
@@ -78,7 +90,11 @@ def calculate_completeness(application_id):
             exhibit_count = EvidenceDocument.query.filter_by(response_id=resp.id).count()
             has_exhibit = exhibit_count > 0
 
-        is_complete = has_narrative or is_sub_na or criterion_na or has_exhibit
+        has_table_rows = False
+        if c.answer_type == "table_rows" and resp:
+            has_table_rows = TableRowData.query.filter_by(response_id=resp.id).count() > 0
+
+        is_complete = has_narrative or is_sub_na or criterion_na or has_exhibit or has_table_rows
 
         if is_complete:
             completed += 1
@@ -110,18 +126,29 @@ def get_user_applications():
     try:
         portfolios = Portfolio.query.filter_by(owner_user_id=current_user.id).all()
         portfolio_ids = [p.id for p in portfolios]
-        if not portfolio_ids:
-            return jsonify([]), 200
+        
+        owned_apps = Application.query.filter(Application.portfolio_id.in_(portfolio_ids)).all() if portfolio_ids else []
+        
+        member_rows = ApplicationMember.query.filter_by(user_id=current_user.id).all()
+        member_app_ids = [m.application_id for m in member_rows]
+        member_apps = Application.query.filter(Application.id.in_(member_app_ids)).all() if member_app_ids else []
 
-        apps = Application.query.filter(Application.portfolio_id.in_(portfolio_ids)).all()
+        seen_ids = set()
+        combined_apps = []
+        for app in owned_apps + member_apps:
+            if app.id not in seen_ids:
+                seen_ids.add(app.id)
+                combined_apps.append(app)
+
         result = [{
             "id": app.id,
             "portfolio_id": app.portfolio_id,
             "standard_pack_id": app.standard_pack_id,
             "status": app.status,
+            "due_date": app.due_date.isoformat() if app.due_date else None,
             "created_at": app.created_at.isoformat(),
             "updated_at": app.updated_at.isoformat() if app.updated_at else None
-        } for app in apps]
+        } for app in combined_apps]
         return jsonify(result), 200
     except Exception as e:
         logger.error(f"Error fetching user applications for user {current_user.id}: {str(e)}", exc_info=True)
@@ -185,6 +212,7 @@ def create_application():
             "portfolio_id": new_application.portfolio_id,
             "standard_pack_id": new_application.standard_pack_id,
             "status": new_application.status,
+            "due_date": new_application.due_date.isoformat() if new_application.due_date else None,
             "created_at": new_application.created_at.isoformat(),
             "updated_at": new_application.updated_at.isoformat() if new_application.updated_at else None
         }), 201
@@ -196,6 +224,46 @@ def create_application():
     except Exception as e:
         db.session.rollback()
         logger.error(f"Unexpected error creating application for user {current_user.id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+@wizard_bp.route("/api/applications/<int:application_id>/due-date", methods=["PUT"])
+@login_required
+def update_application_due_date(application_id):
+    try:
+        app_record, err_resp, err_code = verify_application_ownership(application_id)
+        if err_resp:
+            return err_resp, err_code
+
+        data = request.get_json(silent=True) or {}
+        date_val = data.get("due_date")
+
+        parsed_date = None
+        if date_val:
+            try:
+                parsed_date = datetime.strptime(date_val, "%Y-%m-%d").date()
+            except ValueError:
+                return jsonify({
+                    "error": "Bad Request",
+                    "message": "Invalid date format, expected YYYY-MM-DD"
+                }), 400
+
+        app_record.due_date = parsed_date
+        app_record.updated_at = datetime.utcnow()
+        db.session.commit()
+        logger.info(f"Updated due_date for application {application_id} to {parsed_date}")
+
+        return jsonify({
+            "application_id": application_id,
+            "due_date": app_record.due_date.isoformat() if app_record.due_date else None
+        }), 200
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Database error updating due date for app {application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Database error updating due date", "details": str(e)}), 500
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Unexpected error updating due date for app {application_id}: {str(e)}", exc_info=True)
         return jsonify({"error": "Internal server error", "details": str(e)}), 500
 
 @wizard_bp.route("/api/applications/<int:application_id>/subsections", methods=["GET"])
@@ -238,7 +306,11 @@ def get_subsections(application_id):
                 if c.answer_type == "exhibit" and resp:
                     has_exhibit = EvidenceDocument.query.filter_by(response_id=resp.id).count() > 0
 
-                if has_narrative or is_na or has_exhibit:
+                has_table_rows = False
+                if c.answer_type == "table_rows" and resp:
+                    has_table_rows = TableRowData.query.filter_by(response_id=resp.id).count() > 0
+
+                if has_narrative or is_na or has_exhibit or has_table_rows:
                     answered_count += 1
 
             result.append({
@@ -380,6 +452,415 @@ def upsert_response(application_id, criterion_id):
     except Exception as e:
         db.session.rollback()
         logger.error(f"Unexpected error during response upsert (app {application_id}, criterion {criterion_id}): {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+
+@wizard_bp.route("/api/applications/<int:application_id>/responses/<criterion_id>/table-rows", methods=["GET"])
+@login_required
+def get_table_rows(application_id, criterion_id):
+    try:
+        app_record, err_resp, err_code = verify_application_ownership(application_id)
+        if err_resp:
+            return err_resp, err_code
+
+        criterion = Criterion.query.get(criterion_id)
+        if not criterion:
+            return jsonify({"error": "Criterion not found"}), 404
+
+        if criterion.answer_type != "table_rows":
+            return jsonify({"error": "Criterion does not accept table rows"}), 400
+
+        resp = Response.query.filter_by(
+            application_id=application_id,
+            criterion_id=criterion_id
+        ).first()
+
+        rows = []
+        if resp:
+            table_rows = TableRowData.query.filter_by(response_id=resp.id).order_by(TableRowData.row_index).all()
+            rows = [{"id": r.id, "row_index": r.row_index, "row_data": r.row_data} for r in table_rows]
+
+        return jsonify({
+            "table_columns": criterion.table_columns or [],
+            "rows": rows
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Error fetching table rows for app {application_id}, criterion {criterion_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+
+@wizard_bp.route("/api/applications/<int:application_id>/responses/<criterion_id>/table-rows", methods=["PUT"])
+@login_required
+def save_table_rows(application_id, criterion_id):
+    data = request.get_json() or {}
+    rows_data = data.get("rows", [])
+
+    try:
+        app_record, err_resp, err_code = verify_application_ownership(application_id)
+        if err_resp:
+            return err_resp, err_code
+
+        criterion = Criterion.query.get(criterion_id)
+        if not criterion:
+            return jsonify({"error": "Criterion not found"}), 404
+
+        if criterion.answer_type != "table_rows":
+            return jsonify({"error": "Criterion answer_type is not table_rows"}), 400
+
+        resp = Response.query.filter_by(
+            application_id=application_id,
+            criterion_id=criterion_id
+        ).first()
+
+        now = datetime.utcnow()
+        if not resp:
+            resp = Response(
+                application_id=application_id,
+                criterion_id=criterion_id,
+                narrative_text="",
+                not_applicable=False,
+                created_at=now,
+                updated_at=now
+            )
+            db.session.add(resp)
+            db.session.flush()
+
+        TableRowData.query.filter_by(response_id=resp.id).delete()
+
+        saved_rows = []
+        for idx, row_dict in enumerate(rows_data):
+            new_row = TableRowData(
+                response_id=resp.id,
+                row_index=idx,
+                row_data=row_dict
+            )
+            db.session.add(new_row)
+            saved_rows.append({
+                "row_index": idx,
+                "row_data": row_dict
+            })
+
+        resp.updated_at = now
+        db.session.commit()
+        logger.info(f"Successfully updated table rows for app {application_id}, criterion {criterion_id}")
+
+        return jsonify({
+            "criterion_id": criterion_id,
+            "rows": saved_rows,
+            "saved_at": now.isoformat()
+        }), 200
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Database error during table rows update (app {application_id}, criterion {criterion_id}): {str(e)}", exc_info=True)
+        return jsonify({"error": "Database error during save", "details": str(e)}), 500
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Unexpected error during table rows update (app {application_id}, criterion {criterion_id}): {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+
+@wizard_bp.route("/api/applications/<int:application_id>/responses/<criterion_id>/draft", methods=["POST"])
+@login_required
+def draft_narrative_response(application_id, criterion_id):
+    try:
+        app_record, err_resp, err_code = verify_application_ownership(application_id)
+        if err_resp:
+            return err_resp, err_code
+
+        criterion = Criterion.query.get(criterion_id)
+        if not criterion:
+            return jsonify({"error": "Criterion not found"}), 404
+
+        if criterion.answer_type != "narrative":
+            return jsonify({
+                "error": "Invalid answer type",
+                "details": f"AI drafting is only supported for narrative criteria. Criterion {criterion_id} has answer_type '{criterion.answer_type}'."
+            }), 400
+
+        project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+        location = os.environ.get("GOOGLE_CLOUD_LOCATION")
+
+        if not project_id or not location:
+            logger.warning(f"AI drafting requested for app {application_id}, criterion {criterion_id}, but GOOGLE_CLOUD_PROJECT or GOOGLE_CLOUD_LOCATION is not configured.")
+            return jsonify({
+                "error": "AI drafting is not configured",
+                "details": "Missing required environment variables GOOGLE_CLOUD_PROJECT or GOOGLE_CLOUD_LOCATION."
+            }), 503
+
+        sub_criteria_text = ""
+        sub_crits = Criterion.query.filter_by(parent_id=criterion.id).order_by(Criterion.sort_order).all()
+        if sub_crits:
+            sub_items_list = [f"- Item {sc.item_number}: {sc.question_text}" for sc in sub_crits]
+            sub_criteria_text = "\nSub-criteria to address:\n" + "\n".join(sub_items_list)
+
+        prompt = (
+            f"You are an expert compliance consultant assisting an educational institution in drafting their ACCSC accreditation self-evaluation report.\n"
+            f"Write a professional, thorough, and plausible starting narrative answer for the following accreditation criterion.\n\n"
+            f"Criterion Question: {criterion.question_text}\n"
+            f"{sub_criteria_text}\n\n"
+            f"Instructions:\n"
+            f"- Write generic, editable placeholder-style professional language.\n"
+            f"- Do not fabricate specific real-world school names, specific student enrollment numbers, or exact dates.\n"
+            f"- Provide structured paragraphs that the compliance team can review, refine, and populate with their actual institutional data."
+        )
+
+        try:
+            vertexai.init(project=project_id, location=location)
+            model = GenerativeModel(GEMINI_MODEL_NAME)
+            
+            response = model.generate_content(
+                prompt,
+                generation_config={"max_output_tokens": 500}
+            )
+            draft_text = response.text if response and response.text else ""
+            generated_at = datetime.utcnow().isoformat()
+
+            logger.info(f"Successfully generated AI draft for app {application_id}, criterion {criterion_id}")
+            return jsonify({
+                "criterion_id": criterion_id,
+                "draft_text": draft_text,
+                "generated_at": generated_at
+            }), 200
+
+        except GoogleAPIError as g_err:
+            logger.error(f"Vertex AI API error during drafting for app {application_id}, criterion {criterion_id}: {str(g_err)}", exc_info=True)
+            return jsonify({
+                "error": "Upstream AI service error",
+                "details": str(g_err)
+            }), 502
+        except TimeoutError as t_err:
+            logger.error(f"Vertex AI request timed out for app {application_id}, criterion {criterion_id}: {str(t_err)}", exc_info=True)
+            return jsonify({
+                "error": "AI drafting request timed out",
+                "details": str(t_err)
+            }), 504
+        except Exception as ai_err:
+            logger.error(f"Unexpected error calling Vertex AI for app {application_id}, criterion {criterion_id}: {str(ai_err)}", exc_info=True)
+            return jsonify({
+                "error": "Failed to generate AI draft",
+                "details": str(ai_err)
+            }), 502
+
+    except Exception as e:
+        logger.error(f"Unexpected error in draft route for app {application_id}, criterion {criterion_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error during AI drafting", "details": str(e)}), 500
+
+
+@wizard_bp.route("/api/applications/<int:target_application_id>/clone-from/<int:source_application_id>", methods=["POST"])
+@login_required
+def clone_from_application(target_application_id, source_application_id):
+    try:
+        target_app, err_resp, err_code = verify_application_ownership(target_application_id)
+        if err_resp:
+            return err_resp, err_code
+
+        source_app, err_resp, err_code = verify_application_ownership(source_application_id)
+        if err_resp:
+            return err_resp, err_code
+
+        # Refuse if target already has non-empty narrative responses
+        target_responses = Response.query.filter_by(application_id=target_application_id).all()
+        if any(r.narrative_text and r.narrative_text.strip() for r in target_responses):
+            return jsonify({
+                "error": "Conflict",
+                "message": "Target application already contains non-empty responses. Cloning is only permitted into an empty application."
+            }), 409
+
+        source_criteria = Criterion.query.filter_by(standard_pack_id=source_app.standard_pack_id).all()
+        source_responses = Response.query.filter_by(application_id=source_application_id).all()
+        source_resp_map = {r.criterion_id: r for r in source_responses if r.narrative_text and r.narrative_text.strip()}
+
+        source_crits_by_sub = {}
+        for sc in source_criteria:
+            if sc.answer_type == "narrative" and sc.id in source_resp_map:
+                key = (sc.section_code, sc.subsection_code)
+                if key not in source_crits_by_sub:
+                    source_crits_by_sub[key] = []
+                source_crits_by_sub[key].append(sc)
+
+        target_criteria = Criterion.query.filter_by(standard_pack_id=target_app.standard_pack_id).all()
+        cloned_criteria = []
+        now = datetime.utcnow()
+
+        target_resp_map = {r.criterion_id: r for r in target_responses}
+
+        for tc in target_criteria:
+            if tc.answer_type != "narrative":
+                continue
+
+            key = (tc.section_code, tc.subsection_code)
+            candidates = source_crits_by_sub.get(key, [])
+            if not candidates:
+                continue
+
+            best_match = None
+            best_ratio = 0.0
+
+            for sc in candidates:
+                ratio = difflib.SequenceMatcher(None, tc.question_text, sc.question_text).ratio()
+                if ratio > best_ratio:
+                    best_ratio = ratio
+                    best_match = sc
+
+            if best_match and best_ratio > 0.75:
+                source_resp = source_resp_map[best_match.id]
+                existing_target_resp = target_resp_map.get(tc.id)
+                if existing_target_resp:
+                    existing_target_resp.narrative_text = source_resp.narrative_text
+                    existing_target_resp.updated_at = now
+                else:
+                    new_target_resp = Response(
+                        application_id=target_application_id,
+                        criterion_id=tc.id,
+                        narrative_text=source_resp.narrative_text,
+                        not_applicable=False,
+                        created_at=now,
+                        updated_at=now
+                    )
+                    db.session.add(new_target_resp)
+                    target_resp_map[tc.id] = new_target_resp
+
+                cloned_criteria.append({
+                    "target_criterion_id": tc.id,
+                    "source_criterion_id": best_match.id,
+                    "similarity": round(best_ratio, 3)
+                })
+
+        db.session.commit()
+        logger.info(f"Successfully cloned {len(cloned_criteria)} criteria from app {source_application_id} to app {target_application_id}")
+
+        return jsonify({
+            "cloned_criteria": cloned_criteria,
+            "total_cloned": len(cloned_criteria),
+            "total_target_criteria": len(target_criteria)
+        }), 200
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Database error during clone from app {source_application_id} to {target_application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Database error during clone", "details": str(e)}), 500
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Unexpected error during clone from app {source_application_id} to {target_application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error during clone", "details": str(e)}), 500
+
+
+@wizard_bp.route("/api/applications/<int:application_id>/share", methods=["POST"])
+@login_required
+def share_application(application_id):
+    try:
+        app_record = Application.query.get(application_id)
+        if not app_record:
+            return jsonify({"error": "Application not found"}), 404
+        if not app_record.portfolio or app_record.portfolio.owner_user_id != current_user.id:
+            return jsonify({"error": "Forbidden", "message": "Only the application owner may share this application"}), 403
+
+        data = request.get_json() or {}
+        email = data.get("email")
+        if not email:
+            return jsonify({"error": "Email is required"}), 400
+
+        user_to_share = Users.query.filter_by(email=email).first()
+        if not user_to_share:
+            return jsonify({"error": "User not found", "message": f"No registered user exists with email '{email}'."}), 404
+
+        if user_to_share.id == current_user.id or (app_record.portfolio and app_record.portfolio.owner_user_id == user_to_share.id):
+            return jsonify({"error": "Conflict", "message": "Cannot share an application with its owner."}), 409
+
+        existing_member = ApplicationMember.query.filter_by(
+            application_id=application_id, user_id=user_to_share.id
+        ).first()
+        if existing_member:
+            return jsonify({"error": "Conflict", "message": "User is already a member of this application."}), 409
+
+        new_member = ApplicationMember(
+            application_id=application_id,
+            user_id=user_to_share.id,
+            role="editor"
+        )
+        db.session.add(new_member)
+        db.session.commit()
+        logger.info(f"User {user_to_share.id} ({email}) added as member to application {application_id}")
+
+        return jsonify({
+            "user_id": user_to_share.id,
+            "email": user_to_share.email,
+            "role": new_member.role
+        }), 201
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Database error sharing application {application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Database error sharing application", "details": str(e)}), 500
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Unexpected error sharing application {application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+
+@wizard_bp.route("/api/applications/<int:application_id>/members", methods=["GET"])
+@login_required
+def get_application_members(application_id):
+    try:
+        app_record, err_resp, err_code = verify_application_ownership(application_id)
+        if err_resp:
+            return err_resp, err_code
+
+        owner = app_record.portfolio.owner if app_record.portfolio else None
+        owner_info = {
+            "user_id": owner.id if owner else None,
+            "email": owner.email if owner else None,
+            "role": "owner"
+        }
+
+        members = ApplicationMember.query.filter_by(application_id=application_id).all()
+        members_info = [{
+            "user_id": m.user_id,
+            "email": m.user.email if m.user else None,
+            "role": m.role
+        } for m in members]
+
+        return jsonify([owner_info] + members_info), 200
+
+    except Exception as e:
+        logger.error(f"Error retrieving members for application {application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+
+@wizard_bp.route("/api/applications/<int:application_id>/members/<int:user_id>", methods=["DELETE"])
+@login_required
+def remove_application_member(application_id, user_id):
+    try:
+        app_record = Application.query.get(application_id)
+        if not app_record:
+            return jsonify({"error": "Application not found"}), 404
+        if not app_record.portfolio or app_record.portfolio.owner_user_id != current_user.id:
+            return jsonify({"error": "Forbidden", "message": "Only the application owner may modify membership"}), 403
+
+        if app_record.portfolio.owner_user_id == user_id:
+            return jsonify({"error": "Bad Request", "message": "Cannot remove the application owner."}), 400
+
+        member = ApplicationMember.query.filter_by(
+            application_id=application_id, user_id=user_id
+        ).first()
+        if not member:
+            return jsonify({"error": "Membership not found"}), 404
+
+        db.session.delete(member)
+        db.session.commit()
+        logger.info(f"Removed user {user_id} from application {application_id}")
+
+        return jsonify({"message": "Member removed successfully", "user_id": user_id}), 200
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Database error removing member {user_id} from application {application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Database error removing member", "details": str(e)}), 500
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Unexpected error removing member {user_id} from application {application_id}: {str(e)}", exc_info=True)
         return jsonify({"error": "Internal server error", "details": str(e)}), 500
 
 

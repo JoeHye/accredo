@@ -2,64 +2,90 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Accredo - Application Wizard</title>
+    <title>Accreditation Wizard - Accredo</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; background: #f4f6f9; }
-        header { background: #1e293b; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .progress-container { background: #e2e8f0; border-radius: 4px; overflow: hidden; height: 20px; width: 300px; position: relative; }
-        .progress-bar { background: #3b82f6; height: 100%; width: 0%; transition: width 0.3s ease; }
-        .progress-text { position: absolute; width: 100%; text-align: center; font-size: 12px; font-weight: bold; line-height: 20px; color: #1e293b; }
-        .main-layout { display: flex; flex: 1; overflow: hidden; }
-        sidebar { width: 320px; background: white; border-right: 1px solid #cbd5e1; overflow-y: auto; padding: 15px; }
-        .subsection-item { padding: 10px 12px; margin-bottom: 8px; border-radius: 6px; cursor: pointer; border: 1px solid #e2e8f0; background: #f8fafc; transition: all 0.2s; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: #f8fafc; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
+        #sidebar { width: 320px; background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
+        #sidebar-header { padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        #sidebar-header h2 { margin: 0; font-size: 18px; color: #0f172a; }
+        #subsections-sidebar { flex: 1; overflow-y: auto; padding: 15px; }
+        .subsection-item { padding: 10px 12px; border-radius: 6px; cursor: pointer; margin-bottom: 6px; transition: background 0.15s; }
         .subsection-item:hover { background: #f1f5f9; }
-        .subsection-item.active { background: #eff6ff; border-color: #3b82f6; }
-        .subsection-title { font-weight: bold; font-size: 13px; color: #334155; }
+        .subsection-item.active { background: #eff6ff; border: 1px solid #bfdbfe; }
+        .subsection-title { font-size: 13px; font-weight: 600; color: #334155; }
         .subsection-meta { font-size: 11px; color: #64748b; margin-top: 4px; display: flex; justify-content: space-between; }
-        content-panel { flex: 1; padding: 30px; overflow-y: auto; background: white; }
-        h2 { margin-top: 0; color: #1e293b; }
-        .criterion-card { margin-bottom: 25px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fafafa; }
-        .criterion-header { font-weight: bold; margin-bottom: 8px; color: #475569; font-size: 14px; }
-        .question-text { margin-bottom: 12px; color: #1e293b; line-height: 1.5; }
-        textarea { width: 100%; height: 120px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: inherit; font-size: 14px; resize: vertical; }
-        .sub-criteria-container { margin-left: 20px; margin-top: 15px; border-left: 3px solid #3b82f6; padding-left: 15px; }
-        .save-indicator { font-size: 12px; margin-top: 6px; font-weight: bold; }
+        
+        #content-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        #top-header { background: white; padding: 15px 30px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        #progress-container { width: 250px; }
+        #progress-bar-bg { background: #e2e8f0; border-radius: 4px; height: 8px; overflow: hidden; margin-top: 4px; }
+        #progress-bar { background: #3b82f6; height: 100%; width: 0%; transition: width 0.3s; }
+        
+        #main-content { flex: 1; overflow-y: auto; padding: 30px; }
+        
+        .criterion-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .criterion-header { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 6px; }
+        .question-text { font-size: 14px; font-weight: 500; color: #0f172a; margin-bottom: 12px; line-height: 1.5; }
+        textarea { width: 100%; height: 120px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 13px; resize: vertical; box-sizing: border-box; }
+        textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        
+        .save-indicator { font-size: 12px; margin-top: 6px; }
+        .save-saving { color: #d97706; }
         .save-success { color: #16a34a; }
         .save-error { color: #dc2626; }
-        .save-saving { color: #ca8a04; }
-        .na-banner { background: #fef3c7; border: 1px solid #f59e0b; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .na-banner label { font-weight: bold; color: #b45309; cursor: pointer; }
+        
+        .na-banner { background: #fffbeb; border: 1px solid #fde68a; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .na-banner label { font-size: 13px; font-weight: 600; color: #b45309; cursor: pointer; }
     </style>
 </head>
 <body>
-    <header>
-        <div>
-            <h1>Black Cloud Accreditor (Accredo)</h1>
-            <span style="font-size: 13px; color: #94a3b8;">Application ID: <span id="app-id-display">-</span></span>
+    <div id="sidebar">
+        <div id="sidebar-header">
+            <h2>Accredo</h2>
+            <button onclick="logout()" style="background: none; border: none; color: #ef4444; font-size: 12px; font-weight: bold; cursor: pointer;">Log Out</button>
         </div>
-        <div style="display: flex; align-items: center; gap: 30px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <button id="generate-report-btn" onclick="generateReport()" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.2s;">Generate Report</button>
-                <div id="report-status" style="font-size: 12px; color: #cbd5e1; max-width: 250px;"></div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 20px;">
-                <div>
-                    <div style="font-size: 12px; margin-bottom: 4px; text-align: right;">Overall Completeness: <span id="completeness-pct">0%</span></div>
-                    <div class="progress-container">
-                        <div id="progress-bar" class="progress-bar"></div>
-                        <div id="progress-text" class="progress-text">0 / 0 Completed</div>
-                    </div>
-                </div>
-                <button onclick="logout()" style="padding: 8px 12px; background: #475569; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;">Log Out</button>
-            </div>
+        <div id="subsections-sidebar">
+            <h3>Application Sections</h3>
+            <p style="padding: 10px; font-size: 13px; color: #64748b;">Loading sections...</p>
         </div>
-    </header>
-    <div class="main-layout">
-        <sidebar id="subsections-sidebar"></sidebar>
-        <content-panel id="main-content">
-            <h2>Select a subsection from the left sidebar to begin.</h2>
-        </content-panel>
     </div>
+
+    <div id="content-area">
+        <div id="top-header">
+            <div>
+                <span style="font-size: 12px; color: #64748b;">Application ID: <strong id="app-id-display">-</strong></span>
+            </div>
+            <div id="due-date-widget" style="font-size: 12px; color: #334155; display: flex; align-items: center; gap: 8px;">
+                <span id="due-date-display">No due date set</span>
+                <button type="button" id="set-due-date-btn" onclick="toggleDueDateEditor()" style="background: none; border: none; color: #3b82f6; cursor: pointer; font-size: 12px; text-decoration: underline; padding: 0;">Set due date</button>
+                <div id="due-date-editor" style="display: none; align-items: center; gap: 6px;">
+                    <input type="date" id="due-date-input" style="padding: 3px 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px;">
+                    <button type="button" onclick="saveDueDate()" style="padding: 3px 8px; background: #3b82f6; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">Save</button>
+                    <button type="button" onclick="toggleDueDateEditor()" style="padding: 3px 6px; background: #e2e8f0; color: #334155; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">Cancel</button>
+                </div>
+                <span id="due-date-status" style="font-size: 11px;"></span>
+            </div>
+            <div id="progress-container">
+                <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                    <span style="font-weight: 600;">Completeness</span>
+                    <span id="completeness-pct">0%</span>
+                </div>
+                <div id="progress-bar-bg">
+                    <div id="progress-bar"></div>
+                </div>
+                <div id="progress-text" style="font-size: 10px; color: #64748b; margin-top: 2px; text-align: right;">0 / 0 Completed</div>
+            </div>
+            <div>
+                <button id="generate-report-btn" onclick="generateReport()" style="padding: 8px 16px; background: #0f172a; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;">Generate Report</button>
+                <div id="report-status" style="font-size: 11px; margin-top: 4px; text-align: right;"></div>
+            </div>
+        </div>
+
+        <div id="main-content">
+            <p>Select a section from the sidebar to begin.</p>
+        </div>
+    </div>
+
     <script src="/static/wizard.js"></script>
 </body>
 </html>
