@@ -146,6 +146,9 @@ def get_user_applications():
             "standard_pack_id": app.standard_pack_id,
             "status": app.status,
             "due_date": app.due_date.isoformat() if app.due_date else None,
+            "institution_name": app.portfolio.institution_name if app.portfolio else None,
+            "founding_year": app.portfolio.founding_year if app.portfolio else None,
+            "mission_statement": app.portfolio.mission_statement if app.portfolio else None,
             "created_at": app.created_at.isoformat(),
             "updated_at": app.updated_at.isoformat() if app.updated_at else None
         } for app in combined_apps]
@@ -155,12 +158,59 @@ def get_user_applications():
         return jsonify({"error": "Internal server error"}), 500
 
 
+def _mark_subsection_not_applicable(application_id, section_code, subsection_code, not_applicable_val=True):
+    app_record = Application.query.get(application_id)
+    if not app_record:
+        raise ValueError("Application not found")
+    pack_id = app_record.standard_pack_id
+
+    all_crit_ids = []
+    def gather_ids(c):
+        all_crit_ids.append(c.id)
+        for sc in c.sub_criteria:
+            gather_ids(sc)
+
+    top_criteria = Criterion.query.filter_by(
+        standard_pack_id=pack_id,
+        section_code=section_code,
+        subsection_code=subsection_code,
+        parent_id=None
+    ).all()
+
+    if not top_criteria:
+        raise ValueError("No criteria found for this subsection")
+
+    for c in top_criteria:
+        gather_ids(c)
+
+    now = datetime.utcnow()
+    responses = Response.query.filter_by(application_id=application_id).all()
+    resp_map = {r.criterion_id: r for r in responses}
+
+    for cid in all_crit_ids:
+        resp = resp_map.get(cid)
+        if resp:
+            resp.not_applicable = not_applicable_val
+            resp.updated_at = now
+        else:
+            new_resp = Response(
+                application_id=application_id,
+                criterion_id=cid,
+                narrative_text="",
+                not_applicable=not_applicable_val,
+                created_at=now,
+                updated_at=now
+            )
+            db.session.add(new_resp)
+
+
 @wizard_bp.route("/api/applications", methods=["POST"])
 @login_required
 def create_application():
     data = request.get_json(silent=True) or {}
     requested_pack_id = data.get("standard_pack_id")
     portfolio_name = data.get("name")
+    onboarding_data = data.get("onboarding")
 
     try:
         if requested_pack_id:
@@ -198,6 +248,14 @@ def create_application():
             db.session.flush()
             logger.info(f"Created new Portfolio {portfolio.id} for user {current_user.id}")
 
+        if onboarding_data:
+            if onboarding_data.get("institution_name"):
+                portfolio.institution_name = onboarding_data.get("institution_name")
+            if onboarding_data.get("founding_year") is not None:
+                portfolio.founding_year = onboarding_data.get("founding_year")
+            if onboarding_data.get("mission_statement"):
+                portfolio.mission_statement = onboarding_data.get("mission_statement")
+
         new_application = Application(
             portfolio_id=portfolio.id,
             standard_pack_id=pack.id,
@@ -207,12 +265,44 @@ def create_application():
         db.session.commit()
         logger.info(f"Created new Application {new_application.id} for user {current_user.id} against StandardPack {pack.id}")
 
+        if onboarding_data:
+            distance_ed = onboarding_data.get("offers_distance_education")
+            if distance_ed is False:
+                for sec, sub in [("IX", "A"), ("IX", "B"), ("IX", "C"), ("IX", "D"), ("IX", "E"), ("IX", "F"), ("IX", "G"), ("IX", "H")]:
+                    try:
+                        _mark_subsection_not_applicable(new_application.id, sec, sub, True)
+                        db.session.commit()
+                    except Exception as sub_err:
+                        db.session.rollback()
+                        logger.error(f"Failed to mark subsection {sec}/{sub} N/A during onboarding: {str(sub_err)}", exc_info=True)
+
+            offers_esl = onboarding_data.get("offers_esl")
+            if offers_esl is False:
+                try:
+                    _mark_subsection_not_applicable(new_application.id, "V", "E", True)
+                    db.session.commit()
+                except Exception as sub_err:
+                    db.session.rollback()
+                    logger.error(f"Failed to mark subsection V/E N/A during onboarding: {str(sub_err)}", exc_info=True)
+
+            offers_grad = onboarding_data.get("offers_graduate_degrees")
+            if offers_grad is False:
+                try:
+                    _mark_subsection_not_applicable(new_application.id, "V", "D", True)
+                    db.session.commit()
+                except Exception as sub_err:
+                    db.session.rollback()
+                    logger.error(f"Failed to mark subsection V/D N/A during onboarding: {str(sub_err)}", exc_info=True)
+
         return jsonify({
             "id": new_application.id,
             "portfolio_id": new_application.portfolio_id,
             "standard_pack_id": new_application.standard_pack_id,
             "status": new_application.status,
             "due_date": new_application.due_date.isoformat() if new_application.due_date else None,
+            "institution_name": new_application.portfolio.institution_name if new_application.portfolio else None,
+            "founding_year": new_application.portfolio.founding_year if new_application.portfolio else None,
+            "mission_statement": new_application.portfolio.mission_statement if new_application.portfolio else None,
             "created_at": new_application.created_at.isoformat(),
             "updated_at": new_application.updated_at.isoformat() if new_application.updated_at else None
         }), 201
@@ -660,7 +750,6 @@ def clone_from_application(target_application_id, source_application_id):
         if err_resp:
             return err_resp, err_code
 
-        # Refuse if target already has non-empty narrative responses
         target_responses = Response.query.filter_by(application_id=target_application_id).all()
         if any(r.narrative_text and r.narrative_text.strip() for r in target_responses):
             return jsonify({
@@ -875,48 +964,7 @@ def set_subsection_not_applicable(application_id, section_code, subsection_code)
         if err_resp:
             return err_resp, err_code
 
-        pack_id = app_record.standard_pack_id
-
-        all_crit_ids = []
-        def gather_ids(c):
-            all_crit_ids.append(c.id)
-            for sc in c.sub_criteria:
-                gather_ids(sc)
-
-        top_criteria = Criterion.query.filter_by(
-            standard_pack_id=pack_id,
-            section_code=section_code,
-            subsection_code=subsection_code,
-            parent_id=None
-        ).all()
-
-        if not top_criteria:
-            return jsonify({"error": "No criteria found for this subsection"}), 404
-
-        for c in top_criteria:
-            gather_ids(c)
-
-        now = datetime.utcnow()
-
-        responses = Response.query.filter_by(application_id=application_id).all()
-        resp_map = {r.criterion_id: r for r in responses}
-
-        for cid in all_crit_ids:
-            resp = resp_map.get(cid)
-            if resp:
-                resp.not_applicable = not_applicable_val
-                resp.updated_at = now
-            else:
-                new_resp = Response(
-                    application_id=application_id,
-                    criterion_id=cid,
-                    narrative_text="",
-                    not_applicable=not_applicable_val,
-                    created_at=now,
-                    updated_at=now
-                )
-                db.session.add(new_resp)
-
+        _mark_subsection_not_applicable(application_id, section_code, subsection_code, not_applicable_val)
         db.session.commit()
         logger.info(f"Successfully set not_applicable={not_applicable_val} for subsection {section_code}/{subsection_code}, app {application_id}")
 
@@ -924,7 +972,7 @@ def set_subsection_not_applicable(application_id, section_code, subsection_code)
             "section_code": section_code,
             "subsection_code": subsection_code,
             "not_applicable": not_applicable_val,
-            "saved_at": now.isoformat()
+            "saved_at": datetime.utcnow().isoformat()
         }), 200
 
     except SQLAlchemyError as e:

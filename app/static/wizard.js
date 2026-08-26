@@ -5,6 +5,7 @@ let currentSubsectionCode = null;
 let allUserApplications = [];
 let isCurrentAppEmpty = true;
 let currentApplicationDueDate = null;
+let currentSubsectionsList = [];
 const recentlyClonedCriterionIds = new Set();
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -55,20 +56,108 @@ function renderNoApplicationState() {
             <h2>No Application Found</h2>
             <p style="color: #64748b; margin-bottom: 20px;">You do not have any accreditation applications started yet.</p>
             <div id="start-app-container">
-                <button onclick="startNewApplication()" style="padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; transition: background 0.2s;">Start New Application</button>
+                <button onclick="showStartChoice()" style="padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; transition: background 0.2s;">Start New Application</button>
             </div>
             <div id="create-app-status" style="margin-top: 15px; font-size: 13px;"></div>
         </div>
     `;
 }
 
-async function startNewApplication(selectedPackId = null) {
+function showStartChoice() {
+    const container = document.getElementById("start-app-container");
+    if (!container) return;
+
+    container.innerHTML = `
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; display: inline-block; text-align: left; max-width: 450px;">
+            <p style="font-weight: bold; color: #1e293b; margin-top: 0; font-size: 16px;">How would you like to start?</p>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 20px; line-height: 1.4;">Answer a few quick questions and we'll pre-fill your cover page and skip sections that don't apply to you — takes about 2 minutes.</p>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="startBlankApplicationPrompt()" style="flex: 1; padding: 10px 16px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;">Blank Application</button>
+                <button onclick="showGuidedSetupForm()" style="flex: 1; padding: 10px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;">Guided Setup</button>
+            </div>
+        </div>
+    `;
+}
+
+async function startBlankApplicationPrompt(selectedPackId = null) {
+    await startNewApplication(selectedPackId, null);
+}
+
+function showGuidedSetupForm(selectedPackId = null) {
+    const container = document.getElementById("start-app-container");
+    if (!container) return;
+
+    container.innerHTML = `
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; display: inline-block; text-align: left; max-width: 480px; width: 100%; box-sizing: border-box;">
+            <p style="font-weight: bold; color: #1e293b; margin-top: 0; font-size: 16px;">Guided Setup</p>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; font-weight: bold; color: #334155; margin-bottom: 4px;">Institution Name</label>
+                <input type="text" id="setup-inst-name" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; box-sizing: border-box;" placeholder="e.g. Acme Technical Institute">
+            </div>
+
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; font-weight: bold; color: #334155; margin-bottom: 4px;">Founding Year</label>
+                <input type="number" id="setup-founding-year" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; box-sizing: border-box;" placeholder="e.g. 2018">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 12px; font-weight: bold; color: #334155; margin-bottom: 4px;">Mission Statement (Optional)</label>
+                <textarea id="setup-mission" style="width: 100%; height: 80px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; resize: vertical; box-sizing: border-box;" placeholder="Enter institution mission..."></textarea>
+            </div>
+
+            <div style="margin-bottom: 15px; border-top: 1px solid #e2e8f0; paddingTop: 12px;">
+                <label style="display: block; margin-bottom: 6px; cursor: pointer; color: #334155; font-size: 13px;">
+                    <input type="checkbox" id="setup-dist-ed" style="margin-right: 8px;"> We offer distance education courses
+                </label>
+                <label style="display: block; margin-bottom: 6px; cursor: pointer; color: #334155; font-size: 13px;">
+                    <input type="checkbox" id="setup-esl" style="margin-right: 8px;"> We offer ESL courses
+                </label>
+                <label style="display: block; margin-bottom: 6px; cursor: pointer; color: #334155; font-size: 13px;">
+                    <input type="checkbox" id="setup-grad" style="margin-right: 8px;"> We offer graduate degree programs
+                </label>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button onclick="submitGuidedSetup('${selectedPackId || ""}')" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;">Continue</button>
+                <button onclick="renderNoApplicationState()" style="padding: 10px 16px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;">Back</button>
+            </div>
+        </div>
+    `;
+}
+
+async function submitGuidedSetup(packId) {
+    const instName = document.getElementById("setup-inst-name").value;
+    const foundingYearVal = document.getElementById("setup-founding-year").value;
+    const mission = document.getElementById("setup-mission").value;
+    const distEd = document.getElementById("setup-dist-ed").checked;
+    const esl = document.getElementById("setup-esl").checked;
+    const grad = document.getElementById("setup-grad").checked;
+
+    const onboarding = {
+        institution_name: instName ? instName : null,
+        founding_year: foundingYearVal ? parseInt(foundingYearVal, 10) : null,
+        mission_statement: mission ? mission : null,
+        offers_distance_education: distEd,
+        offers_esl: esl,
+        offers_graduate_degrees: grad
+    };
+
+    await startNewApplication(packId ? packId : null, onboarding);
+}
+
+async function startNewApplication(selectedPackId = null, onboardingObj = null) {
     const statusDiv = document.getElementById("create-app-status");
-    statusDiv.style.color = "#ca8a04";
-    statusDiv.textContent = "Creating new application...";
+    if (statusDiv) {
+        statusDiv.style.color = "#ca8a04";
+        statusDiv.textContent = "Creating new application...";
+    }
 
     try {
-        const payload = selectedPackId ? { standard_pack_id: selectedPackId } : {};
+        const payload = {};
+        if (selectedPackId) payload.standard_pack_id = selectedPackId;
+        if (onboardingObj) payload.onboarding = onboardingObj;
+
         const response = await fetch("/api/applications", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -78,7 +167,7 @@ async function startNewApplication(selectedPackId = null) {
         const result = await response.json();
         
         if (response.status === 400 && result.available_standard_packs) {
-            statusDiv.textContent = "";
+            if (statusDiv) statusDiv.textContent = "";
             const startContainer = document.getElementById("start-app-container") || document.getElementById("main-content");
             
             let formHtml = `
@@ -111,16 +200,20 @@ async function startNewApplication(selectedPackId = null) {
             throw new Error(result.error || result.message || "Failed to create application");
         }
 
-        statusDiv.style.color = "#16a34a";
-        statusDiv.textContent = "Application created successfully! Loading wizard...";
+        if (statusDiv) {
+            statusDiv.style.color = "#16a34a";
+            statusDiv.textContent = "Application created successfully! Loading wizard...";
+        }
 
         setTimeout(() => {
             window.location.reload();
         }, 600);
 
     } catch (err) {
-        statusDiv.style.color = "#dc2626";
-        statusDiv.textContent = `Failed to create application: ${err.message}`;
+        if (statusDiv) {
+            statusDiv.style.color = "#dc2626";
+            statusDiv.textContent = `Failed to create application: ${err.message}`;
+        }
     }
 }
 
@@ -130,7 +223,7 @@ function submitPackPicker() {
         alert("Please select a standard pack.");
         return;
     }
-    startNewApplication(selectedRadio.value);
+    startBlankApplicationPrompt(selectedRadio.value);
 }
 
 function toggleDueDateEditor() {
@@ -180,7 +273,6 @@ async function saveDueDate() {
         toggleDueDateEditor();
         statusSpan.textContent = "";
 
-        // Refresh application list cache
         const appsRes = await fetch("/api/applications");
         if (appsRes.ok) {
             allUserApplications = await appsRes.json() || [];
@@ -212,17 +304,17 @@ function renderDueDateDisplay() {
 
     if (diffDays > 14) {
         displaySpan.textContent = `Due in ${diffDays} days (${currentApplicationDueDate})`;
-        displaySpan.style.color = "#16a34a"; // green
+        displaySpan.style.color = "#16a34a";
     } else if (diffDays >= 1 && diffDays <= 14) {
         displaySpan.textContent = `Due in ${diffDays} days (${currentApplicationDueDate})`;
-        displaySpan.style.color = "#d97706"; // amber
+        displaySpan.style.color = "#d97706";
     } else if (diffDays === 0) {
         displaySpan.textContent = `Due today (${currentApplicationDueDate})`;
-        displaySpan.style.color = "#dc2626"; // red
+        displaySpan.style.color = "#dc2626";
     } else {
         const overdueDays = Math.abs(diffDays);
         displaySpan.textContent = `Overdue by ${overdueDays} days (${currentApplicationDueDate})`;
-        displaySpan.style.color = "#dc2626"; // red
+        displaySpan.style.color = "#dc2626";
     }
 
     if (setBtn) setBtn.textContent = "Edit";
@@ -264,6 +356,7 @@ async function loadSubsections() {
         const response = await fetch(`/api/applications/${applicationId}/subsections`);
         if (!response.ok) throw new Error("Failed to load subsections");
         const subsections = await response.json();
+        currentSubsectionsList = subsections || [];
         const sidebar = document.getElementById("subsections-sidebar");
         sidebar.innerHTML = "<h3>Application Sections</h3>";
         subsections.forEach(sub => {
@@ -306,7 +399,6 @@ function renderSubsectionContent(data) {
     const panel = document.getElementById("main-content");
     panel.innerHTML = "";
 
-    // Render clone banner if application is empty and other applications exist
     const otherApps = allUserApplications.filter(a => a.id !== applicationId);
     if (isCurrentAppEmpty && otherApps.length > 0) {
         const cloneBanner = document.createElement("div");
@@ -346,14 +438,12 @@ function renderSubsectionContent(data) {
         return;
     }
 
-    // Collect all answerable source criteria for this subsection (narrative type with non-empty narrative_text)
     const copySources = [];
     function collectSources(criterionList) {
         criterionList.forEach(c => {
             if (c.answer_type === "narrative" && c.response && c.response.narrative_text && c.response.narrative_text.trim() !== "") {
                 copySources.push(c);
             }
-            // Check sub-criteria recursively if present
             if (c.sub_criteria && c.sub_criteria.length > 0) {
                 collectSources(c.sub_criteria);
             }
@@ -364,6 +454,33 @@ function renderSubsectionContent(data) {
     data.criteria.forEach(crit => {
         panel.appendChild(createCriterionCard(crit, copySources));
     });
+
+    let currentIndex = currentSubsectionsList.findIndex(sub => sub.section_code === currentSectionCode && sub.subsection_code === currentSubsectionCode);
+    let prevSub = currentIndex > 0 ? currentSubsectionsList[currentIndex - 1] : null;
+    let nextSub = currentIndex >= 0 && currentIndex < currentSubsectionsList.length - 1 ? currentSubsectionsList[currentIndex + 1] : null;
+
+    const navContainer = document.createElement("div");
+    navContainer.style.cssText = "display: flex; justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;";
+    
+    const prevBtn = document.createElement("button");
+    prevBtn.textContent = "← Previous Subsection";
+    prevBtn.style.cssText = `padding: 8px 16px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: ${prevSub ? 'pointer' : 'not-allowed'}; opacity: ${prevSub ? '1' : '0.5'};`;
+    prevBtn.disabled = !prevSub;
+    if (prevSub) {
+        prevBtn.onclick = () => selectSubsection(prevSub.section_code, prevSub.subsection_code);
+    }
+
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "Next Subsection →";
+    nextBtn.style.cssText = `padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: ${nextSub ? 'pointer' : 'not-allowed'}; opacity: ${nextSub ? '1' : '0.5'};`;
+    nextBtn.disabled = !nextSub;
+    if (nextSub) {
+        nextBtn.onclick = () => selectSubsection(nextSub.section_code, nextSub.subsection_code);
+    }
+
+    navContainer.appendChild(prevBtn);
+    navContainer.appendChild(nextBtn);
+    panel.appendChild(navContainer);
 }
 
 async function executeCloneFrom() {
@@ -428,6 +545,15 @@ function createCriterionCard(crit, copySources) {
                     <div id="status-${sc.id}" class="save-indicator"></div>
                 `;
                 setTimeout(() => loadTableRows(applicationId, sc.id, sc.table_columns), 0);
+            } else if (sc.answer_type === "exhibit") {
+                subCriteriaHtml += `
+                    <div class="criterion-header">Item ${sc.item_number}</div>
+                    ${scClonedBadgeHtml}
+                    <div class="question-text">${sc.question_text}</div>
+                    <div id="exhibit-container-${sc.id}">Loading attachments...</div>
+                    <div id="status-${sc.id}" class="save-indicator"></div>
+                `;
+                setTimeout(() => loadExhibits(applicationId, sc.id), 0);
             } else {
                 const draftButtonHtml = sc.answer_type === "narrative" ? `
                     <button type="button" id="draft-btn-${sc.id}" onclick="draftAnswer('${sc.id}')" style="margin-top: 6px; padding: 4px 10px; background: #8b5cf6; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;">Draft this answer</button>
@@ -490,6 +616,16 @@ function createCriterionCard(crit, copySources) {
             ${subCriteriaHtml}
         `;
         setTimeout(() => loadTableRows(applicationId, crit.id, crit.table_columns), 0);
+    } else if (crit.answer_type === "exhibit") {
+        card.innerHTML = `
+            <div class="criterion-header">Criterion ${crit.item_number} (${crit.id})</div>
+            ${topClonedBadgeHtml}
+            <div class="question-text">${crit.question_text}</div>
+            <div id="exhibit-container-${crit.id}">Loading attachments...</div>
+            <div id="status-${crit.id}" class="save-indicator"></div>
+            ${subCriteriaHtml}
+        `;
+        setTimeout(() => loadExhibits(applicationId, crit.id), 0);
     } else {
         const topDraftButtonHtml = crit.answer_type === "narrative" ? `
             <button type="button" id="draft-btn-${crit.id}" onclick="draftAnswer('${crit.id}')" style="margin-top: 6px; padding: 4px 10px; background: #8b5cf6; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;">Draft this answer</button>
@@ -535,6 +671,134 @@ function createCriterionCard(crit, copySources) {
     return card;
 }
 
+async function loadExhibits(appId, criterionId) {
+    const container = document.getElementById(`exhibit-container-${criterionId}`);
+    if (!container) return;
+
+    try {
+        const res = await fetch(`/api/applications/${appId}/responses/${criterionId}/exhibit`);
+        if (!res.ok) throw new Error("Failed to load exhibits");
+        const files = await res.json();
+        renderExhibitEditor(appId, criterionId, files || []);
+    } catch (err) {
+        container.innerHTML = `<p style="color: red; font-size: 12px;">Error loading attachments: ${err.message}</p>`;
+    }
+}
+
+function renderExhibitEditor(appId, criterionId, files) {
+    const container = document.getElementById(`exhibit-container-${criterionId}`);
+    if (!container) return;
+
+    let html = "";
+    if (files.length === 0) {
+        html += `<div style="font-size: 13px; color: #dc2626; font-weight: bold; margin-bottom: 8px;">[EXHIBIT REQUIRED]</div>`;
+    } else {
+        html += `<div style="margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px;">`;
+        files.forEach(f => {
+            html += `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 6px 10px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 13px;">
+                    <span>📎 <b>${escapeHtml(f.filename)}</b> (${Math.round(f.file_size_bytes / 1024)} KB)</span>
+                    <button type="button" onclick="deleteExhibit('${appId}', '${criterionId}', ${f.id})" style="background: none; border: none; color: #dc2626; cursor: pointer; font-weight: bold; font-size: 12px;">Delete</button>
+                </div>
+            `;
+        });
+        html += `</div>`;
+    }
+
+    html += `
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <input type="file" id="exhibit-file-${criterionId}" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="font-size: 12px;">
+            <button type="button" onclick="uploadExhibit('${appId}', '${criterionId}')" style="padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;">Upload</button>
+        </div>
+    `;
+
+    container.innerHTML = html;
+}
+
+async function uploadExhibit(appId, criterionId) {
+    const fileInput = document.getElementById(`exhibit-file-${criterionId}`);
+    const statusDiv = document.getElementById(`status-${criterionId}`);
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        alert("Please select a file to upload.");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    if (statusDiv) {
+        statusDiv.className = "save-indicator save-saving";
+        statusDiv.textContent = "Uploading exhibit...";
+    }
+
+    try {
+        const response = await fetch(`/api/applications/${appId}/responses/${criterionId}/exhibit`, {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error || result.details || "Exhibit upload failed");
+        }
+
+        if (statusDiv) {
+            statusDiv.className = "save-indicator save-success";
+            statusDiv.textContent = `Uploaded at ${new Date().toLocaleTimeString()}`;
+        }
+
+        await loadExhibits(appId, criterionId);
+        await loadCompleteness();
+        await loadSubsections();
+    } catch (err) {
+        if (statusDiv) {
+            statusDiv.className = "save-indicator save-error";
+            statusDiv.textContent = `Upload failed — ${err.message}`;
+        } else {
+            alert(`Upload failed: ${err.message}`);
+        }
+    }
+}
+
+async function deleteExhibit(appId, criterionId, evidenceId) {
+    const confirmed = confirm("Delete this file?");
+    if (!confirmed) return;
+
+    const statusDiv = document.getElementById(`status-${criterionId}`);
+    if (statusDiv) {
+        statusDiv.className = "save-indicator save-saving";
+        statusDiv.textContent = "Deleting exhibit...";
+    }
+
+    try {
+        const response = await fetch(`/api/applications/${appId}/responses/${criterionId}/exhibit/${evidenceId}`, {
+            method: "DELETE"
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error || result.details || "Failed to delete exhibit");
+        }
+
+        if (statusDiv) {
+            statusDiv.className = "save-indicator save-success";
+            statusDiv.textContent = `Deleted at ${new Date().toLocaleTimeString()}`;
+        }
+
+        await loadExhibits(appId, criterionId);
+        await loadCompleteness();
+        await loadSubsections();
+    } catch (err) {
+        if (statusDiv) {
+            statusDiv.className = "save-indicator save-error";
+            statusDiv.textContent = `Delete failed — ${err.message}`;
+        } else {
+            alert(`Delete failed: ${err.message}`);
+        }
+    }
+}
+
 function copyAnswer(targetCriterionId) {
     const select = document.getElementById(`copy-source-${targetCriterionId}`);
     const textarea = document.getElementById(`response-${targetCriterionId}`);
@@ -546,8 +810,6 @@ function copyAnswer(targetCriterionId) {
         return;
     }
 
-    // Find source criterion text from DOM or global data contexts. 
-    // Since copySources aren't globally scoped, we can search for the textarea of the source criterion ID.
     const sourceTextarea = document.getElementById(`response-${sourceCriterionId}`);
     if (!sourceTextarea) {
         alert("Source response text not found.");
@@ -566,7 +828,6 @@ function copyAnswer(targetCriterionId) {
     }
 
     textarea.value = sourceText;
-    // Trigger input/change or let user save manually per instruction
 }
 
 async function draftAnswer(criterionId) {

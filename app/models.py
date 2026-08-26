@@ -65,6 +65,9 @@ class Portfolio(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     owner_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     name = db.Column(db.String(255), nullable=False)
+    institution_name = db.Column(db.String(255), nullable=True)
+    founding_year = db.Column(db.Integer, nullable=True)
+    mission_statement = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     applications = db.relationship("Application", backref="portfolio", cascade="all, delete-orphan", lazy=True)
