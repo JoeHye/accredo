@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Accredo - Login</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { margin-top: 0; color: #1e293b; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #475569; font-size: 13px; }
+        input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+        button { width: 100%; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        button:hover { background: #2563eb; }
+        .error-msg { color: #dc2626; font-size: 13px; margin-bottom: 15px; text-align: center; display: none; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>Accredo Login</h2>
+        <div id="error-alert" class="error-msg"></div>
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required autocomplete="current-password">
+            </div>
+            <button type="submit">Log In</button>
+        </form>
+    </div>
+    <script>
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const errorAlert = document.getElementById("error-alert");
+            errorAlert.style.display = "none";
+            errorAlert.textContent = "";
+            try {
+                const response = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || "Login failed");
+                }
+                window.location.href = "/wizard";
+            } catch (err) {
+                errorAlert.textContent = err.message;
+                errorAlert.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>

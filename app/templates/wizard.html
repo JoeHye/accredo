@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Accredo - Application Wizard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; background: #f4f6f9; }
+        header { background: #1e293b; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .progress-container { background: #e2e8f0; border-radius: 4px; overflow: hidden; height: 20px; width: 300px; position: relative; }
+        .progress-bar { background: #3b82f6; height: 100%; width: 0%; transition: width 0.3s ease; }
+        .progress-text { position: absolute; width: 100%; text-align: center; font-size: 12px; font-weight: bold; line-height: 20px; color: #1e293b; }
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        sidebar { width: 320px; background: white; border-right: 1px solid #cbd5e1; overflow-y: auto; padding: 15px; }
+        .subsection-item { padding: 10px 12px; margin-bottom: 8px; border-radius: 6px; cursor: pointer; border: 1px solid #e2e8f0; background: #f8fafc; transition: all 0.2s; }
+        .subsection-item:hover { background: #f1f5f9; }
+        .subsection-item.active { background: #eff6ff; border-color: #3b82f6; }
+        .subsection-title { font-weight: bold; font-size: 13px; color: #334155; }
+        .subsection-meta { font-size: 11px; color: #64748b; margin-top: 4px; display: flex; justify-content: space-between; }
+        content-panel { flex: 1; padding: 30px; overflow-y: auto; background: white; }
+        h2 { margin-top: 0; color: #1e293b; }
+        .criterion-card { margin-bottom: 25px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fafafa; }
+        .criterion-header { font-weight: bold; margin-bottom: 8px; color: #475569; font-size: 14px; }
+        .question-text { margin-bottom: 12px; color: #1e293b; line-height: 1.5; }
+        textarea { width: 100%; height: 120px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: inherit; font-size: 14px; resize: vertical; }
+        .sub-criteria-container { margin-left: 20px; margin-top: 15px; border-left: 3px solid #3b82f6; padding-left: 15px; }
+        .save-indicator { font-size: 12px; margin-top: 6px; font-weight: bold; }
+        .save-success { color: #16a34a; }
+        .save-error { color: #dc2626; }
+        .save-saving { color: #ca8a04; }
+        .na-banner { background: #fef3c7; border: 1px solid #f59e0b; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .na-banner label { font-weight: bold; color: #b45309; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>Black Cloud Accreditor (Accredo)</h1>
+            <span style="font-size: 13px; color: #94a3b8;">Application ID: <span id="app-id-display">-</span></span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 30px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button id="generate-report-btn" onclick="generateReport()" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.2s;">Generate Report</button>
+                <div id="report-status" style="font-size: 12px; color: #cbd5e1; max-width: 250px;"></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div>
+                    <div style="font-size: 12px; margin-bottom: 4px; text-align: right;">Overall Completeness: <span id="completeness-pct">0%</span></div>
+                    <div class="progress-container">
+                        <div id="progress-bar" class="progress-bar"></div>
+                        <div id="progress-text" class="progress-text">0 / 0 Completed</div>
+                    </div>
+                </div>
+                <button onclick="logout()" style="padding: 8px 12px; background: #475569; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;">Log Out</button>
+            </div>
+        </div>
+    </header>
+    <div class="main-layout">
+        <sidebar id="subsections-sidebar"></sidebar>
+        <content-panel id="main-content">
+            <h2>Select a subsection from the left sidebar to begin.</h2>
+        </content-panel>
+    </div>
+    <script src="/static/wizard.js"></script>
+</body>
+</html>
