@@ -1,4 +1,3 @@
-# app/exhibit_routes.py
 import os
 import logging
 from datetime import datetime
@@ -7,7 +6,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import SQLAlchemyError
 from app import db
-from app.models import Application, Criterion, Response, EvidenceDocument, ApplicationMember
+from app.models import Application, Criterion, Response, EvidenceDocument
 
 logger = logging.getLogger(__name__)
 exhibit_bp = Blueprint("exhibit", __name__)
@@ -23,11 +22,7 @@ def verify_application_ownership(application_id):
         app_record = Application.query.get(application_id)
         if not app_record:
             return None, jsonify({"error": "Application not found"}), 404
-        is_owner = app_record.portfolio and app_record.portfolio.owner_user_id == current_user.id
-        is_member = ApplicationMember.query.filter_by(
-            application_id=application_id, user_id=current_user.id
-        ).first() is not None
-        if not is_owner and not is_member:
+        if not app_record.portfolio or app_record.portfolio.owner_user_id != current_user.id:
             return None, jsonify({"error": "Forbidden", "message": "You do not have access to this application"}), 403
         return app_record, None, None
     except Exception as e:

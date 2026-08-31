@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 wizard_bp = Blueprint("wizard", __name__, template_folder="templates", static_folder="static")
 
-GEMINI_MODEL_NAME = "gemini-2.0-flash-001"
+GEMINI_MODEL_NAME = "gemini-2.5-flash"
 
 def get_report_output_dir():
     report_dir = os.environ.get("REPORT_OUTPUT_DIR")
