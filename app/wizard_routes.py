@@ -11,9 +11,8 @@ from app import db
 from app.models import Application, StandardPack, Criterion, Response, EvidenceDocument, Portfolio, TableRowData, ApplicationMember, Users, SubsectionAssignment
 from app.report_generator import generate_report
 
-import vertexai
-from vertexai.generative_models import GenerativeModel, GenerationConfig
-from google.api_core.exceptions import GoogleAPIError
+from google import genai
+from google.genai import types
 
 logger = logging.getLogger(__name__)
 
@@ -814,30 +813,21 @@ def draft_narrative_response(application_id, criterion_id):
             )
 
         try:
-            vertexai.init(project=project_id, location=location)
-            model = GenerativeModel(GEMINI_MODEL_NAME)
+            client = genai.Client(vertexai=True, project=project_id, location=location)
             
-            try:
-                gen_config = GenerationConfig(
-                    max_output_tokens=2000,
-                    thinking_config={"thinking_budget": 0}
+            response = client.models.generate_content(
+                model=GEMINI_MODEL_NAME,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    max_output_tokens=4000,
+                    thinking_config=types.ThinkingConfig(thinking_budget=0)
                 )
-            except Exception as cfg_err:
-                logger.warning(f"Failed to instantiate GenerationConfig with thinking_config; falling back to dict configuration: {str(cfg_err)}")
-                gen_config = {
-                    "max_output_tokens": 2000,
-                    "thinking_config": {"thinking_budget": 0}
-                }
-
-            response = model.generate_content(
-                prompt,
-                generation_config=gen_config
             )
 
             if response and hasattr(response, "candidates") and response.candidates:
                 candidate = response.candidates[0]
                 finish_reason = getattr(candidate, "finish_reason", None)
-                if finish_reason is not None and finish_reason != 1:
+                if finish_reason is not None and finish_reason != "STOP":
                     safety_ratings = getattr(candidate, "safety_ratings", None)
                     logger.warning(f"Vertex AI generation non-STOP finish_reason: {finish_reason}, safety_ratings: {safety_ratings} for app {application_id}, criterion {criterion_id}")
                     return jsonify({
@@ -862,20 +852,20 @@ def draft_narrative_response(application_id, criterion_id):
                 "generated_at": generated_at
             }), 200
 
-        except GoogleAPIError as g_err:
-            logger.error(f"Vertex AI API error during drafting for app {application_id}, criterion {criterion_id}: {str(g_err)}", exc_info=True)
+        except (genai.errors.ClientError, genai.errors.ServerError) as g_err:
+            logger.error(f"Google GenAI API error during drafting for app {application_id}, criterion {criterion_id}: {str(g_err)}", exc_info=True)
             return jsonify({
                 "error": "Upstream AI service error",
                 "details": str(g_err)
             }), 502
         except TimeoutError as t_err:
-            logger.error(f"Vertex AI request timed out for app {application_id}, criterion {criterion_id}: {str(t_err)}", exc_info=True)
+            logger.error(f"Google GenAI request timed out for app {application_id}, criterion {criterion_id}: {str(t_err)}", exc_info=True)
             return jsonify({
                 "error": "AI drafting request timed out",
                 "details": str(t_err)
             }), 504
         except Exception as ai_err:
-            logger.error(f"Unexpected error calling Vertex AI for app {application_id}, criterion {criterion_id}: {str(ai_err)}", exc_info=True)
+            logger.error(f"Unexpected error calling Google GenAI for app {application_id}, criterion {criterion_id}: {str(ai_err)}", exc_info=True)
             return jsonify({
                 "error": "Failed to generate AI draft",
                 "details": str(ai_err)
