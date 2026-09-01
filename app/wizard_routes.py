@@ -8,11 +8,11 @@ from flask import Blueprint, jsonify, request, render_template, send_file
 from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
 from app import db
-from app.models import Application, StandardPack, Criterion, Response, EvidenceDocument, Portfolio, TableRowData, ApplicationMember, Users
+from app.models import Application, StandardPack, Criterion, Response, EvidenceDocument, Portfolio, TableRowData, ApplicationMember, Users, SubsectionAssignment
 from app.report_generator import generate_report
 
 import vertexai
-from vertexai.generative_models import GenerativeModel
+from vertexai.generative_models import GenerativeModel, GenerationConfig
 from google.api_core.exceptions import GoogleAPIError
 
 logger = logging.getLogger(__name__)
@@ -20,6 +20,16 @@ logger = logging.getLogger(__name__)
 wizard_bp = Blueprint("wizard", __name__, template_folder="templates", static_folder="static")
 
 GEMINI_MODEL_NAME = "gemini-2.5-flash"
+
+SECTION_TONE_GUIDANCE = {
+    "I": "Emphasize policy, process, and organizational structure.",
+    "II": "Emphasize curriculum design, learning objectives, and educational rationale.",
+    "III": "Emphasize faculty qualifications, credentials, and oversight processes.",
+    "IV": "Emphasize transparency, accuracy, and ethical practice in recruitment/advertising.",
+    "V": "Emphasize fairness, consistency, and documentation in admissions decisions.",
+    "VI": "Emphasize student support, accessibility, and responsiveness of services.",
+    "VII": "Emphasize measurable outcomes, tracking, and evidence-based assessment.",
+}
 
 def get_report_output_dir():
     report_dir = os.environ.get("REPORT_OUTPUT_DIR")
@@ -45,6 +55,21 @@ def verify_application_ownership(application_id):
     except Exception as e:
         logger.error(f"Error verifying application ownership for app {application_id}: {str(e)}", exc_info=True)
         return None, jsonify({"error": "Internal server error"}), 500
+
+def check_edit_permission(application_id, section_code, subsection_code):
+    app_record = Application.query.get(application_id)
+    if not app_record.enforce_assignments:
+        return True, None, None
+    if app_record.portfolio.owner_user_id == current_user.id:
+        return True, None, None
+    assignment = SubsectionAssignment.query.filter_by(
+        application_id=application_id, section_code=section_code, subsection_code=subsection_code
+    ).first()
+    if not assignment:
+        return True, None, None
+    if assignment.assigned_user_id != current_user.id:
+        return False, jsonify({"error": "Forbidden", "message": "This section is assigned to another team member"}), 403
+    return True, None, None
 
 def calculate_completeness(application_id):
     app_record = Application.query.get(application_id)
@@ -502,6 +527,10 @@ def upsert_response(application_id, criterion_id):
         if not criterion:
             return jsonify({"error": "Criterion not found"}), 404
 
+        edit_ok, edit_resp, edit_code = check_edit_permission(application_id, criterion.section_code, criterion.subsection_code)
+        if not edit_ok:
+            return edit_resp, edit_code
+
         existing_resp = Response.query.filter_by(
             application_id=application_id,
             criterion_id=criterion_id
@@ -595,6 +624,10 @@ def save_table_rows(application_id, criterion_id):
         if not criterion:
             return jsonify({"error": "Criterion not found"}), 404
 
+        edit_ok, edit_resp, edit_code = check_edit_permission(application_id, criterion.section_code, criterion.subsection_code)
+        if not edit_ok:
+            return edit_resp, edit_code
+
         if criterion.answer_type != "table_rows":
             return jsonify({"error": "Criterion answer_type is not table_rows"}), 400
 
@@ -663,6 +696,10 @@ def draft_narrative_response(application_id, criterion_id):
         if not criterion:
             return jsonify({"error": "Criterion not found"}), 404
 
+        edit_ok, edit_resp, edit_code = check_edit_permission(application_id, criterion.section_code, criterion.subsection_code)
+        if not edit_ok:
+            return edit_resp, edit_code
+
         if criterion.answer_type != "narrative":
             return jsonify({
                 "error": "Invalid answer type",
@@ -679,35 +716,146 @@ def draft_narrative_response(application_id, criterion_id):
                 "details": "Missing required environment variables GOOGLE_CLOUD_PROJECT or GOOGLE_CLOUD_LOCATION."
             }), 503
 
+        # 1. Ground in onboarding data from portfolio
+        portfolio = Portfolio.query.get(app_record.portfolio_id)
+        known_facts_lines = []
+        if portfolio:
+            if portfolio.institution_name:
+                known_facts_lines.append(f"Name: {portfolio.institution_name}")
+            if portfolio.founding_year:
+                known_facts_lines.append(f"Founded: {portfolio.founding_year}")
+            if portfolio.mission_statement:
+                known_facts_lines.append(f"Mission: {portfolio.mission_statement}")
+
+        onboarding_context = ""
+        if known_facts_lines:
+            onboarding_context = "Known facts about this institution: " + ". ".join(known_facts_lines) + "."
+
+        # 2. Ground in same-application answers (same section_code and subsection_code, non-empty narrative)
+        same_sub_criteria = Criterion.query.filter_by(
+            standard_pack_id=app_record.standard_pack_id,
+            section_code=criterion.section_code,
+            subsection_code=criterion.subsection_code
+        ).all()
+
+        other_crit_ids = [c.id for c in same_sub_criteria if c.id != criterion.id]
+        other_responses = Response.query.filter(
+            Response.application_id == application_id,
+            Response.criterion_id.in_(other_crit_ids),
+            Response.narrative_text != None,
+            Response.narrative_text != ""
+        ).limit(5).all()
+
+        other_resp_map = {r.criterion_id: r.narrative_text for r in other_responses}
+        context_excerpts = []
+        for c in same_sub_criteria:
+            if c.id in other_resp_map and len(context_excerpts) < 5:
+                ans = other_resp_map[c.id].strip()
+                if len(ans) > 150:
+                    ans = ans[:147] + "..."
+                context_excerpts.append(f"- [{c.question_text}]: {ans}")
+
+        same_app_context = ""
+        if context_excerpts:
+            same_app_context = "For context, this school has already answered related questions in this section as follows:\n" + "\n".join(context_excerpts)
+
+        # 3. Section-aware tone
+        tone_instruction = SECTION_TONE_GUIDANCE.get(criterion.section_code, "Use clear, professional, policy-appropriate language.")
+
+        # 4. Unknowable-fact detection & trigger phrases
+        trigger_phrases = [
+            "state specific", "state law", "state requirement", "licensure requirement",
+            "legal requirement", "government requirement", "regulation", "statute",
+            "code section", "citation"
+        ]
+        q_text_lower = criterion.question_text.lower()
+        is_guidance_mode = any(phrase in q_text_lower for phrase in trigger_phrases)
+
         sub_criteria_text = ""
         sub_crits = Criterion.query.filter_by(parent_id=criterion.id).order_by(Criterion.sort_order).all()
         if sub_crits:
             sub_items_list = [f"- Item {sc.item_number}: {sc.question_text}" for sc in sub_crits]
             sub_criteria_text = "\nSub-criteria to address:\n" + "\n".join(sub_items_list)
 
-        prompt = (
-            f"You are an expert compliance consultant assisting an educational institution in drafting their ACCSC accreditation self-evaluation report.\n"
-            f"Write a professional, thorough, and plausible starting narrative answer for the following accreditation criterion.\n\n"
-            f"Criterion Question: {criterion.question_text}\n"
-            f"{sub_criteria_text}\n\n"
-            f"Instructions:\n"
-            f"- Write generic, editable placeholder-style professional language.\n"
-            f"- Do not fabricate specific real-world school names, specific student enrollment numbers, or exact dates.\n"
-            f"- Provide structured paragraphs that the compliance team can review, refine, and populate with their actual institutional data."
+        anti_fabrication = (
+            "Never invent or guess at: dollar amounts, staff or faculty names, specific dates beyond what is explicitly "
+            "provided above, percentages or statistics, specific policy or regulation citations, exact page/document references. "
+            "If specific information is needed that isn't provided above, write generic placeholder language like '[specific amount]' "
+            "rather than inventing a plausible-sounding number."
         )
+
+        if is_guidance_mode:
+            prompt = (
+                f"You are an expert compliance consultant assisting an educational institution in drafting their ACCSC accreditation self-evaluation report.\n"
+                f"This question asks for external regulatory, statutory, or state-specific legal facts that Accredo's internal data cannot supply.\n\n"
+                f"Criterion Question: {criterion.question_text}\n"
+                f"{sub_criteria_text}\n\n"
+                f"{onboarding_context}\n"
+                f"{same_app_context}\n\n"
+                f"Tone guidance: {tone_instruction}\n\n"
+                f"Instructions:\n"
+                f"- Do not attempt to draft an answer. Instead, generate a short bulleted 'what to research and include' guidance list (3-5 bullets) specific to this question.\n"
+                f"- Explicitly do NOT invent or guess at any actual regulation, citation, or legal requirement — only describe the SHAPE of information needed.\n"
+                f"- {anti_fabrication}"
+            )
+        else:
+            prompt = (
+                f"You are an expert compliance consultant assisting an educational institution in drafting their ACCSC accreditation self-evaluation report.\n"
+                f"Write a professional, thorough, and plausible starting narrative answer for the following accreditation criterion.\n\n"
+                f"Criterion Question: {criterion.question_text}\n"
+                f"{sub_criteria_text}\n\n"
+                f"{onboarding_context}\n"
+                f"{same_app_context}\n\n"
+                f"Tone guidance: {tone_instruction}\n\n"
+                f"Instructions:\n"
+                f"- Write generic, editable placeholder-style professional language.\n"
+                f"- {anti_fabrication}\n"
+                f"- Provide structured paragraphs that the compliance team can review, refine, and populate with their actual institutional data."
+            )
 
         try:
             vertexai.init(project=project_id, location=location)
             model = GenerativeModel(GEMINI_MODEL_NAME)
             
+            try:
+                gen_config = GenerationConfig(
+                    max_output_tokens=2000,
+                    thinking_config={"thinking_budget": 0}
+                )
+            except Exception as cfg_err:
+                logger.warning(f"Failed to instantiate GenerationConfig with thinking_config; falling back to dict configuration: {str(cfg_err)}")
+                gen_config = {
+                    "max_output_tokens": 2000,
+                    "thinking_config": {"thinking_budget": 0}
+                }
+
             response = model.generate_content(
                 prompt,
-                generation_config={"max_output_tokens": 500}
+                generation_config=gen_config
             )
-            draft_text = response.text if response and response.text else ""
+
+            if response and hasattr(response, "candidates") and response.candidates:
+                candidate = response.candidates[0]
+                finish_reason = getattr(candidate, "finish_reason", None)
+                if finish_reason is not None and finish_reason != 1:
+                    safety_ratings = getattr(candidate, "safety_ratings", None)
+                    logger.warning(f"Vertex AI generation non-STOP finish_reason: {finish_reason}, safety_ratings: {safety_ratings} for app {application_id}, criterion {criterion_id}")
+                    return jsonify({
+                        "error": "AI generation interrupted",
+                        "details": f"Model generation stopped with finish reason: {finish_reason}",
+                        "finish_reason": str(finish_reason)
+                    }), 422
+
+            raw_text = response.text if response and response.text else ""
+            
+            if is_guidance_mode:
+                draft_text = "GUIDANCE (this requires information Accredo cannot supply — please research and replace this with your actual answer):\n\n" + raw_text
+            else:
+                draft_text = raw_text
+
             generated_at = datetime.utcnow().isoformat()
 
-            logger.info(f"Successfully generated AI draft for app {application_id}, criterion {criterion_id}")
+            logger.info(f"Successfully generated AI draft for app {application_id}, criterion {criterion_id} (Guidance mode: {is_guidance_mode})")
             return jsonify({
                 "criterion_id": criterion_id,
                 "draft_text": draft_text,
@@ -953,6 +1101,170 @@ def remove_application_member(application_id, user_id):
         return jsonify({"error": "Internal server error", "details": str(e)}), 500
 
 
+@wizard_bp.route("/api/applications/<int:application_id>/assignments", methods=["PUT"])
+@login_required
+def upsert_assignment(application_id):
+    try:
+        app_record = Application.query.get(application_id)
+        if not app_record:
+            return jsonify({"error": "Application not found"}), 404
+        if not app_record.portfolio or app_record.portfolio.owner_user_id != current_user.id:
+            return jsonify({"error": "Forbidden", "message": "Only the application owner may manage assignments"}), 403
+
+        data = request.get_json(silent=True) or {}
+        section_code = data.get("section_code")
+        subsection_code = data.get("subsection_code")
+        assigned_user_id = data.get("assigned_user_id")
+
+        if not section_code or assigned_user_id is None:
+            return jsonify({"error": "Bad Request", "message": "section_code and assigned_user_id are required"}), 400
+
+        owner_id = app_record.portfolio.owner_user_id
+        is_owner = (assigned_user_id == owner_id)
+        is_member = ApplicationMember.query.filter_by(
+            application_id=application_id, user_id=assigned_user_id
+        ).first() is not None
+
+        if not is_owner and not is_member:
+            return jsonify({"error": "Bad Request", "message": "Assigned user must be the application owner or an application member"}), 400
+
+        assignment = SubsectionAssignment.query.filter_by(
+            application_id=application_id,
+            section_code=section_code,
+            subsection_code=subsection_code
+        ).first()
+
+        now = datetime.utcnow()
+        if assignment:
+            assignment.assigned_user_id = assigned_user_id
+            action = "updated"
+        else:
+            assignment = SubsectionAssignment(
+                application_id=application_id,
+                section_code=section_code,
+                subsection_code=subsection_code,
+                assigned_user_id=assigned_user_id
+            )
+            db.session.add(assignment)
+            action = "created"
+
+        db.session.commit()
+        logger.info(f"Successfully {action} assignment for app {application_id}, sec {section_code}, sub {subsection_code} to user {assigned_user_id}")
+
+        return jsonify({
+            "id": assignment.id,
+            "application_id": assignment.application_id,
+            "section_code": assignment.section_code,
+            "subsection_code": assignment.subsection_code,
+            "assigned_user_id": assignment.assigned_user_id,
+            "created_at": assignment.created_at.isoformat()
+        }), 200
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Database error during assignment upsert for app {application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Database error saving assignment", "details": str(e)}), 500
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Unexpected error during assignment upsert for app {application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+
+@wizard_bp.route("/api/applications/<int:application_id>/assignments", methods=["GET"])
+@login_required
+def get_assignments(application_id):
+    try:
+        app_record, err_resp, err_code = verify_application_ownership(application_id)
+        if err_resp:
+            return err_resp, err_code
+
+        assignments = db.session.query(SubsectionAssignment, Users).join(
+            Users, SubsectionAssignment.assigned_user_id == Users.id
+        ).filter(SubsectionAssignment.application_id == application_id).all()
+
+        result = [{
+            "id": asm.id,
+            "section_code": asm.section_code,
+            "subsection_code": asm.subsection_code,
+            "assigned_user_id": asm.assigned_user_id,
+            "email": usr.email,
+            "created_at": asm.created_at.isoformat()
+        } for asm, usr in assignments]
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        logger.error(f"Error fetching assignments for app {application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+
+@wizard_bp.route("/api/applications/<int:application_id>/assignments/<int:assignment_id>", methods=["DELETE"])
+@login_required
+def delete_assignment(application_id, assignment_id):
+    try:
+        app_record = Application.query.get(application_id)
+        if not app_record:
+            return jsonify({"error": "Application not found"}), 404
+        if not app_record.portfolio or app_record.portfolio.owner_user_id != current_user.id:
+            return jsonify({"error": "Forbidden", "message": "Only the application owner may delete assignments"}), 403
+
+        assignment = SubsectionAssignment.query.filter_by(
+            id=assignment_id, application_id=application_id
+        ).first()
+        if not assignment:
+            return jsonify({"error": "Assignment not found"}), 404
+
+        db.session.delete(assignment)
+        db.session.commit()
+        logger.info(f"Successfully deleted assignment ID {assignment_id} for app {application_id}")
+
+        return jsonify({"message": "Assignment deleted successfully", "assignment_id": assignment_id}), 200
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Database error deleting assignment {assignment_id} for app {application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Database error deleting assignment", "details": str(e)}), 500
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Unexpected error deleting assignment {assignment_id} for app {application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+
+@wizard_bp.route("/api/applications/<int:application_id>/assignment-mode", methods=["PUT"])
+@login_required
+def update_assignment_mode(application_id):
+    try:
+        app_record = Application.query.get(application_id)
+        if not app_record:
+            return jsonify({"error": "Application not found"}), 404
+        if not app_record.portfolio or app_record.portfolio.owner_user_id != current_user.id:
+            return jsonify({"error": "Forbidden", "message": "Only the application owner may update assignment mode"}), 403
+
+        data = request.get_json(silent=True) or {}
+        if "enforce_assignments" not in data:
+            return jsonify({"error": "Bad Request", "message": "enforce_assignments field is required"}), 400
+
+        enforce_val = bool(data.get("enforce_assignments"))
+        app_record.enforce_assignments = enforce_val
+        app_record.updated_at = datetime.utcnow()
+        db.session.commit()
+        logger.info(f"Updated enforce_assignments for application {application_id} to {enforce_val}")
+
+        return jsonify({
+            "application_id": application_id,
+            "enforce_assignments": app_record.enforce_assignments
+        }), 200
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Database error updating assignment mode for app {application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Database error updating assignment mode", "details": str(e)}), 500
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Unexpected error updating assignment mode for app {application_id}: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+
 @wizard_bp.route("/api/applications/<int:application_id>/subsections/<section_code>/<subsection_code>/not-applicable", methods=["PUT"])
 @login_required
 def set_subsection_not_applicable(application_id, section_code, subsection_code):
@@ -964,7 +1276,52 @@ def set_subsection_not_applicable(application_id, section_code, subsection_code)
         if err_resp:
             return err_resp, err_code
 
-        _mark_subsection_not_applicable(application_id, section_code, subsection_code, not_applicable_val)
+        edit_ok, edit_resp, edit_code = check_edit_permission(application_id, section_code, subsection_code)
+        if not edit_ok:
+            return edit_resp, edit_code
+
+        pack_id = app_record.standard_pack_id
+
+        all_crit_ids = []
+        def gather_ids(c):
+            all_crit_ids.append(c.id)
+            for sc in c.sub_criteria:
+                gather_ids(sc)
+
+        top_criteria = Criterion.query.filter_by(
+            standard_pack_id=pack_id,
+            section_code=section_code,
+            subsection_code=subsection_code,
+            parent_id=None
+        ).all()
+
+        if not top_criteria:
+            return jsonify({"error": "No criteria found for this subsection"}), 404
+
+        for c in top_criteria:
+            gather_ids(c)
+
+        now = datetime.utcnow()
+
+        responses = Response.query.filter_by(application_id=application_id).all()
+        resp_map = {r.criterion_id: r for r in responses}
+
+        for cid in all_crit_ids:
+            resp = resp_map.get(cid)
+            if resp:
+                resp.not_applicable = not_applicable_val
+                resp.updated_at = now
+            else:
+                new_resp = Response(
+                    application_id=application_id,
+                    criterion_id=cid,
+                    narrative_text="",
+                    not_applicable=not_applicable_val,
+                    created_at=now,
+                    updated_at=now
+                )
+                db.session.add(new_resp)
+
         db.session.commit()
         logger.info(f"Successfully set not_applicable={not_applicable_val} for subsection {section_code}/{subsection_code}, app {application_id}")
 
@@ -972,7 +1329,7 @@ def set_subsection_not_applicable(application_id, section_code, subsection_code)
             "section_code": section_code,
             "subsection_code": subsection_code,
             "not_applicable": not_applicable_val,
-            "saved_at": datetime.utcnow().isoformat()
+            "saved_at": now.isoformat()
         }), 200
 
     except SQLAlchemyError as e:

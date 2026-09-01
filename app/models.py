@@ -18,6 +18,7 @@ class Users(db.Model, UserMixin):
 
     portfolios = db.relationship("Portfolio", backref="owner", lazy=True)
     application_memberships = db.relationship("ApplicationMember", backref="user", cascade="all, delete-orphan", lazy=True)
+    subsection_assignments = db.relationship("SubsectionAssignment", backref="assigned_user", cascade="all, delete-orphan", lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -65,6 +66,9 @@ class Portfolio(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     owner_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     name = db.Column(db.String(255), nullable=False)
+    institution_name = db.Column(db.String(255), nullable=True)
+    founding_year = db.Column(db.Integer, nullable=True)
+    mission_statement = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     applications = db.relationship("Application", backref="portfolio", cascade="all, delete-orphan", lazy=True)
@@ -77,12 +81,14 @@ class Application(db.Model):
     standard_pack_id = db.Column(db.String(100), db.ForeignKey("standard_packs.id"), nullable=False)
     status = db.Column(db.String(50), nullable=False, default="draft")
     due_date = db.Column(db.Date, nullable=True)
+    enforce_assignments = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     responses = db.relationship("Response", backref="application", cascade="all, delete-orphan", lazy=True)
     status_history = db.relationship("StatusHistory", backref="application", cascade="all, delete-orphan", lazy=True)
     members = db.relationship("ApplicationMember", backref="application", cascade="all, delete-orphan", lazy=True)
+    subsection_assignments = db.relationship("SubsectionAssignment", backref="application", cascade="all, delete-orphan", lazy=True)
 
 class ApplicationMember(db.Model):
     __tablename__ = "application_members"
@@ -93,6 +99,18 @@ class ApplicationMember(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     __table_args__ = (
         db.UniqueConstraint("application_id", "user_id", name="uq_application_member"),
+    )
+
+class SubsectionAssignment(db.Model):
+    __tablename__ = "subsection_assignments"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    application_id = db.Column(db.Integer, db.ForeignKey("applications.id"), nullable=False)
+    section_code = db.Column(db.String(50), nullable=False)
+    subsection_code = db.Column(db.String(50), nullable=True)
+    assigned_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    __table_args__ = (
+        db.UniqueConstraint("application_id", "section_code", "subsection_code", name="uq_subsection_assignment"),
     )
 
 class Response(db.Model):
