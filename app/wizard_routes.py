@@ -11,8 +11,9 @@ from app import db
 from app.models import Application, StandardPack, Criterion, Response, EvidenceDocument, Portfolio, TableRowData, ApplicationMember, Users, SubsectionAssignment
 from app.report_generator import generate_report
 
-from google import genai
-from google.genai import types
+import vertexai
+from vertexai.generative_models import GenerativeModel, GenerationConfig
+from google.api_core.exceptions import GoogleAPIError
 
 logger = logging.getLogger(__name__)
 
@@ -56,16 +57,19 @@ def verify_application_ownership(application_id):
         return None, jsonify({"error": "Internal server error"}), 500
 
 def check_edit_permission(application_id, section_code, subsection_code):
+    # Call AFTER verify_application_ownership already succeeded.
+    # Returns (True, None, None) if editing is allowed, or 
+    # (False, error_response, status_code) if blocked.
     app_record = Application.query.get(application_id)
     if not app_record.enforce_assignments:
         return True, None, None
     if app_record.portfolio.owner_user_id == current_user.id:
-        return True, None, None
+        return True, None, None  # owner can always edit regardless of assignment
     assignment = SubsectionAssignment.query.filter_by(
         application_id=application_id, section_code=section_code, subsection_code=subsection_code
     ).first()
     if not assignment:
-        return True, None, None
+        return True, None, None  # unassigned subsections stay open to anyone with access
     if assignment.assigned_user_id != current_user.id:
         return False, jsonify({"error": "Forbidden", "message": "This section is assigned to another team member"}), 403
     return True, None, None
@@ -813,21 +817,38 @@ def draft_narrative_response(application_id, criterion_id):
             )
 
         try:
-            client = genai.Client(vertexai=True, project=project_id, location=location)
+            vertexai.init(project=project_id, location=location)
+            model = GenerativeModel(GEMINI_MODEL_NAME)
             
-            response = client.models.generate_content(
-                model=GEMINI_MODEL_NAME,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    max_output_tokens=4000,
-                    thinking_config=types.ThinkingConfig(thinking_budget=0)
+            try:
+                gen_config = GenerationConfig(
+                    max_output_tokens=2000,
+                    thinking_config={"thinking_budget": 0}
                 )
-            )
+            except Exception as cfg_err:
+                logger.warning(f"GenerationConfig does not support thinking_config on this SDK version ({str(cfg_err)}); falling back to max_output_tokens only. Thinking cannot be disabled with this SDK version, so truncation risk remains elevated until google-cloud-aiplatform is upgraded.")
+                gen_config = GenerationConfig(max_output_tokens=2000)
+
+            try:
+                response = model.generate_content(
+                    prompt,
+                    generation_config=gen_config
+                )
+            except Exception as gen_err:
+                if "thinking_config" in str(gen_err) or "Unknown field" in str(gen_err):
+                    logger.warning(f"generate_content rejected thinking_config ({str(gen_err)}); retrying with max_output_tokens only.")
+                    gen_config = GenerationConfig(max_output_tokens=2000)
+                    response = model.generate_content(
+                        prompt,
+                        generation_config=gen_config
+                    )
+                else:
+                    raise
 
             if response and hasattr(response, "candidates") and response.candidates:
                 candidate = response.candidates[0]
                 finish_reason = getattr(candidate, "finish_reason", None)
-                if finish_reason is not None and finish_reason != "STOP":
+                if finish_reason is not None and finish_reason != 1:
                     safety_ratings = getattr(candidate, "safety_ratings", None)
                     logger.warning(f"Vertex AI generation non-STOP finish_reason: {finish_reason}, safety_ratings: {safety_ratings} for app {application_id}, criterion {criterion_id}")
                     return jsonify({
@@ -852,20 +873,20 @@ def draft_narrative_response(application_id, criterion_id):
                 "generated_at": generated_at
             }), 200
 
-        except (genai.errors.ClientError, genai.errors.ServerError) as g_err:
-            logger.error(f"Google GenAI API error during drafting for app {application_id}, criterion {criterion_id}: {str(g_err)}", exc_info=True)
+        except GoogleAPIError as g_err:
+            logger.error(f"Vertex AI API error during drafting for app {application_id}, criterion {criterion_id}: {str(g_err)}", exc_info=True)
             return jsonify({
                 "error": "Upstream AI service error",
                 "details": str(g_err)
             }), 502
         except TimeoutError as t_err:
-            logger.error(f"Google GenAI request timed out for app {application_id}, criterion {criterion_id}: {str(t_err)}", exc_info=True)
+            logger.error(f"Vertex AI request timed out for app {application_id}, criterion {criterion_id}: {str(t_err)}", exc_info=True)
             return jsonify({
                 "error": "AI drafting request timed out",
                 "details": str(t_err)
             }), 504
         except Exception as ai_err:
-            logger.error(f"Unexpected error calling Google GenAI for app {application_id}, criterion {criterion_id}: {str(ai_err)}", exc_info=True)
+            logger.error(f"Unexpected error calling Vertex AI for app {application_id}, criterion {criterion_id}: {str(ai_err)}", exc_info=True)
             return jsonify({
                 "error": "Failed to generate AI draft",
                 "details": str(ai_err)
