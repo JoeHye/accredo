@@ -4,7 +4,17 @@
 
 $baseUrl = "http://127.0.0.1:5000"
 $email = "joehye@gmail.com"
-$password = "TestPass123!"
+# Password is read at run time; never hard-code it here (this repo is public).
+if ($env:ACCREDO_TEST_PASSWORD) {
+    $password = $env:ACCREDO_TEST_PASSWORD
+} else {
+    $securePassword = Read-Host "Password for $email" -AsSecureString
+    $password = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($securePassword))
+}
+if (-not $password) {
+    Write-Host "No password provided. Set ACCREDO_TEST_PASSWORD or enter it at the prompt." -ForegroundColor Red
+    exit 1
+}
 $applicationId = 1   # change this if your application has a different ID
 
 Write-Host "Logging in..." -ForegroundColor Cyan
