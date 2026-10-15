@@ -22,7 +22,17 @@ def create_app():
         logger.info(f"No DATABASE_URL found. Falling back to local SQLite at absolute path: {db_path}")
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
+    if not db_url.startswith("sqlite"):
+        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True, "pool_recycle": 280}
+    secret_key = os.environ.get("SECRET_KEY")
+    if not secret_key:
+        if db_url.startswith("sqlite"):
+            secret_key = "dev-secret-key-local-only"
+            logger.warning("SECRET_KEY not set; using local-only dev key (SQLite mode).")
+        else:
+            logger.error("SECRET_KEY is not set but DATABASE_URL points at a non-SQLite database. Refusing to start.")
+            raise RuntimeError("SECRET_KEY must be set when DATABASE_URL points at a non-SQLite database.")
+    app.config["SECRET_KEY"] = secret_key
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
