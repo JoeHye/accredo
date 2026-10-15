@@ -22,6 +22,8 @@ def create_app():
         logger.info(f"No DATABASE_URL found. Falling back to local SQLite at absolute path: {db_path}")
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    if not db_url.startswith("sqlite"):
+        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True, "pool_recycle": 280}
     secret_key = os.environ.get("SECRET_KEY")
     if not secret_key:
         if db_url.startswith("sqlite"):
