@@ -68,39 +68,6 @@ def logout():
     except Exception as e:
         logger.error(f"Error during logout: {str(e)}", exc_info=True)
         return jsonify({"error": "Internal server error during logout"}), 500
-@auth_bp.route("/api/auth/reset-password", methods=["POST"])
-def reset_password():
-    # SECURITY WARNING: this endpoint has NO authentication or verification --
-    # it accepts an email and a new password and changes it, no proof of
-    # identity required. This is intentional, temporary, alpha-test-only
-    # functionality (added 2026-09-09) to unblock the owner's own account
-    # when no reset flow existed yet. This MUST be locked down (current-password
-    # requirement, emailed reset token, or removed entirely) before any real
-    # customer data touches this app -- see accredo-prod-deploy checklist.
-    data = request.get_json() or {}
-    email = data.get("email", "").strip().lower()
-    new_password = data.get("new_password", "")
-    if not email or not new_password:
-        return jsonify({"error": "Email and new_password are required"}), 400
-    if len(new_password) < 8:
-        return jsonify({"error": "Password must be at least 8 characters long"}), 400
-    try:
-        user = Users.query.filter_by(email=email).first()
-        if not user:
-            return jsonify({"error": "User not found"}), 404
-        user.set_password(new_password)
-        db.session.commit()
-        logger.warning(f"Password reset (unauthenticated endpoint) for user: {email}")
-        return jsonify({"message": "Password reset successful. Please log in."}), 200
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        logger.error(f"Database error during password reset for {email}: {str(e)}", exc_info=True)
-        return jsonify({"error": "Database error during password reset", "details": str(e)}), 500
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"Unexpected error during password reset for {email}: {str(e)}", exc_info=True)
-        return jsonify({"error": "Internal server error during password reset", "details": str(e)}), 500
-
 @auth_bp.route("/api/auth/me", methods=["GET"])
 @login_required
 def me():
