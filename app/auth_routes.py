@@ -33,11 +33,11 @@ def register():
     except SQLAlchemyError as e:
         db.session.rollback()
         logger.error(f"Database error during user registration for {email}: {str(e)}", exc_info=True)
-        return jsonify({"error": "Database error during registration", "details": str(e)}), 500
+        return jsonify({"error": "Registration failed due to a server error. Please try again later."}), 500
     except Exception as e:
         db.session.rollback()
         logger.error(f"Unexpected error during user registration for {email}: {str(e)}", exc_info=True)
-        return jsonify({"error": "Internal server error during registration", "details": str(e)}), 500
+        return jsonify({"error": "Registration failed due to a server error. Please try again later."}), 500
 @auth_bp.route("/api/auth/login", methods=["POST"])
 def login():
     data = request.get_json() or {}
