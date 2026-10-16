@@ -74,19 +74,16 @@ def create_app():
             db.session.execute(db.text("SELECT 1"))
             return jsonify({"status": "healthy", "database": "connected"}), 200
         except SQLAlchemyError as e:
-            error_msg = str(e)
-            logger.error(f"Health check failed - Database unreachable: {error_msg}", exc_info=True)
+            # Full error goes to server logs only; the response must not expose connection details.
+            logger.error(f"Health check failed - Database unreachable: {str(e)}", exc_info=True)
             return jsonify({
                 "status": "unhealthy",
-                "error": "Database connection failed",
-                "details": error_msg
+                "error": "Database connection failed"
             }), 503
         except Exception as e:
-            error_msg = str(e)
-            logger.error(f"Health check failed with unexpected error: {error_msg}", exc_info=True)
+            logger.error(f"Health check failed with unexpected error: {str(e)}", exc_info=True)
             return jsonify({
                 "status": "unhealthy",
-                "error": "An unexpected error occurred during health check",
-                "details": error_msg
+                "error": "An unexpected error occurred during health check"
             }), 503
     return app
