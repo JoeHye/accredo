@@ -16,3 +16,6 @@ tests/
 test/
 .pytest_cache/
 *.md
+
+# Separate service with its own image; keep it out of the main Accredo image.
+ser_diagnostic/

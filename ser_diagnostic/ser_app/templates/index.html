@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SER Readiness Diagnostic</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 0 auto; padding: 16px; line-height: 1.5; color: #1a1a1a; background: #fff; }
+    .draft { background: #fff3cd; border: 1px solid #e0b100; padding: 8px 12px; margin-bottom: 16px; }
+    fieldset { border: 1px solid #ddd; margin: 16px 0; padding: 12px; }
+    .q { margin: 12px 0; }
+    .q label { margin-right: 12px; white-space: nowrap; }
+    .err { color: #b00020; font-size: 0.9em; }
+    .hp { position: absolute; left: -10000px; }
+    #result { display: none; border-top: 2px solid #333; margin-top: 24px; padding-top: 12px; }
+    input[type=text], input[type=email] { width: 100%; max-width: 420px; padding: 6px; }
+  </style>
+</head>
+<body>
+  {% if is_draft %}
+  <div class="draft"><strong>DRAFT v{{ content.version }}</strong>: content awaiting review. Not for public use.</div>
+  {% endif %}
+  <h1>SER Readiness Diagnostic</h1>
+  <p>{{ content.intro }}</p>
+
+  <form id="diag" novalidate>
+    {% for section in sections %}
+    <fieldset>
+      <legend>{{ section.title }}</legend>
+      {% for q in section.questions %}
+      <div class="q" data-qid="{{ q.id }}">
+        <div>{{ loop.index }}. {{ q.text }}</div>
+        {% for a in content.answer_scale %}
+        <label><input type="radio" name="{{ q.id }}" value="{{ a.value }}" required> {{ a.label }}</label>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </fieldset>
+    {% endfor %}
+
+    <fieldset>
+      <legend>Where should we keep your results?</legend>
+      <p><label>Your name<br><input type="text" name="name" maxlength="200" required></label></p>
+      <p><label>Email<br><input type="email" name="email" maxlength="255" required></label></p>
+      <p><label>School name<br><input type="text" name="school_name" maxlength="255" required></label></p>
+      <p class="hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>
+    </fieldset>
+    <p id="form-error" class="err" role="alert"></p>
+    <button type="submit">See my result</button>
+  </form>
+
+  <section id="result" aria-live="polite">
+    <h2 id="r-title"></h2>
+    <p id="r-score"></p>
+    <p id="r-message"></p>
+    <ul id="r-gaps"></ul>
+    <p>{{ content.call_to_action.text }}</p>
+    <p><strong>{{ content.call_to_action.button }}</strong></p>
+  </section>
+
+  <script>
+  // All server-supplied text is inserted with textContent, never innerHTML.
+  document.getElementById("diag").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const form = ev.target, errBox = document.getElementById("form-error");
+    errBox.textContent = "";
+    const answers = {};
+    form.querySelectorAll(".q").forEach((q) => {
+      const checked = q.querySelector("input:checked");
+      if (checked) answers[q.dataset.qid] = checked.value;
+    });
+    const payload = {
+      // form.elements[...]: plain form.name would return the <form>'s own name attribute.
+      name: form.elements["name"].value, email: form.elements["email"].value,
+      school_name: form.elements["school_name"].value, website: form.elements["website"].value,
+      answers: answers,
+    };
+    let resp, body;
+    try {
+      resp = await fetch("/api/submit", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload)});
+      body = await resp.json();
+    } catch (e) {
+      errBox.textContent = "Couldn't reach the server. Check your connection and try again.";
+      return;
+    }
+    if (!resp.ok) {
+      const details = body && body.fields ? Object.values(body.fields).join(" ") : "";
+      errBox.textContent = ((body && body.error) || "Something went wrong.") + (details ? " " + details : "");
+      return;
+    }
+    document.getElementById("r-title").textContent = body.result_title;
+    document.getElementById("r-score").textContent = "Score: " + body.score + " / " + body.max_score;
+    document.getElementById("r-message").textContent = body.result_message;
+    const list = document.getElementById("r-gaps");
+    list.replaceChildren();
+    body.gaps.forEach((g) => {
+      const li = document.createElement("li");
+      const q = document.createElement("strong");
+      q.textContent = g.question + " (" + g.answer + ")";
+      li.appendChild(q);
+      li.appendChild(document.createTextNode(" " + g.why));
+      list.appendChild(li);
+    });
+    form.style.display = "none";
+    document.getElementById("result").style.display = "block";
+  });
+  </script>
+</body>
+</html>

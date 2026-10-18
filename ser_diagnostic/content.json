@@ -1,0 +1,93 @@
+{
+  "status": "DRAFT",
+  "version": "0.1",
+  "review_notes": "DRAFT v0.1 awaiting owner review. Items marked confidence 'A' must be checked against the current ACCSC Standards of Accreditation before status can change to APPROVED. Branding and call to action are not yet decided.",
+  "branding": "TBD",
+  "intro": "How ready is your school to write its ACCSC Self-Evaluation Report? Answer 10 quick questions (about 3 minutes) to see where you stand and what to tackle first.",
+  "answer_scale": [
+    {"value": "yes", "label": "Yes", "points": 2},
+    {"value": "partly", "label": "Partly or not sure", "points": 1},
+    {"value": "no", "label": "No", "points": 0}
+  ],
+  "sections": [
+    {"title": "Eligibility", "question_ids": ["q1", "q2"]},
+    {"title": "Outcomes and data", "question_ids": ["q3", "q4"]},
+    {"title": "Programs and faculty", "question_ids": ["q5", "q6", "q7"]},
+    {"title": "Operations and policies", "question_ids": ["q8", "q9"]},
+    {"title": "SER process", "question_ids": ["q10"]}
+  ],
+  "questions": [
+    {
+      "id": "q1", "gate": true, "confidence": "C",
+      "text": "Is your school licensed or authorized to operate by your state's education agency?",
+      "why": "ACCSC only considers institutions that are legally authorized in their state."
+    },
+    {
+      "id": "q2", "gate": true, "confidence": "A",
+      "text": "Has your school been operating continuously, under the same ownership, for at least two years?",
+      "why": "ACCSC requires an operating history before an initial application.",
+      "review_flag": "Check the exact length and the ownership rule."
+    },
+    {
+      "id": "q3", "gate": false, "confidence": "C",
+      "text": "Can you produce graduation and employment rates for each program, from your own records, for your most recent reporting period?",
+      "why": "Student achievement rates are central to ACCSC review and are compared against benchmarks."
+    },
+    {
+      "id": "q4", "gate": false, "confidence": "C",
+      "text": "Do you keep documentation for each graduate's employment (employer, job title, start date, and how it was verified)?",
+      "why": "Reported employment has to be supported by records a reviewer can sample."
+    },
+    {
+      "id": "q5", "gate": false, "confidence": "C",
+      "text": "Does every program have a written outline with objectives, hours, and a course sequence that matches what you actually teach?",
+      "why": "Program documentation is reviewed against delivery during the on-site visit."
+    },
+    {
+      "id": "q6", "gate": false, "confidence": "A",
+      "text": "Does each program have an advisory committee of industry practitioners that meets regularly and keeps minutes?",
+      "why": "Program Advisory Committees are an ACCSC requirement.",
+      "review_flag": "Minimum meeting frequency (believed to be twice a year) is unconfirmed."
+    },
+    {
+      "id": "q7", "gate": false, "confidence": "C",
+      "text": "Do you have a file for each instructor showing qualifications and experience that meet the standard for the subjects they teach?",
+      "why": "Faculty qualification files are routinely reviewed."
+    },
+    {
+      "id": "q8", "gate": false, "confidence": "C",
+      "text": "Are your admissions, refund, and student complaint policies written, published to students, and applied consistently?",
+      "why": "These policies are reviewed for both content and consistent practice."
+    },
+    {
+      "id": "q9", "gate": false, "confidence": "A",
+      "text": "Do you have recent financial statements prepared by an independent accountant?",
+      "why": "Financial stability is part of the review.",
+      "review_flag": "Whether ACCSC requires an audit or a review level of statement is unconfirmed."
+    },
+    {
+      "id": "q10", "gate": false, "confidence": "A",
+      "text": "Has someone been named to lead the Self-Evaluation Report, with time set aside and staff from each area involved?",
+      "why": "The SER is a whole-institution self-study. Schools that treat it as one person's writing task usually run late.",
+      "review_flag": "General practice, not a written rule."
+    }
+  ],
+  "gate_result": {
+    "key": "not_eligible",
+    "title": "Not yet eligible",
+    "message": "ACCSC has eligibility requirements your school doesn't meet yet. Here's what to put in place first."
+  },
+  "bands": [
+    {"key": "ready", "min_score": 16, "title": "Ready to start your SER",
+     "message": "Your foundation is solid. The main work now is writing: turning your records into clear, evidence-backed narratives."},
+    {"key": "close", "min_score": 9, "title": "Close: a few gaps first",
+     "message": "You have a lot in place. Close the gaps below before you start writing so your SER doesn't stall."},
+    {"key": "foundation", "min_score": 0, "title": "Build the foundation first",
+     "message": "Several core pieces aren't in place yet. Start with the items below; they take the longest."}
+  ],
+  "call_to_action": {
+    "text": "Accredo walks your team through every ACCSC standard and drafts your SER narratives from your own data.",
+    "button": "Request a pilot spot",
+    "decided": false
+  }
+}

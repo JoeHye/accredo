@@ -1,0 +1,8 @@
+instance/
+__pycache__/
+*.pyc
+tests/
+.pytest_cache/
+*.md
+.env
+*.db
