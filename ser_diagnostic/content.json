@@ -1,12 +1,24 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "brand": "Accredo",
   "title": "SER Readiness Diagnostic",
   "intro": "How ready is your school to write its ACCSC Self-Evaluation Report? Answer 10 quick questions (about 3 minutes) to see where you stand and what to tackle first.",
   "answers": [
-    {"key": "yes", "label": "Yes", "points": 2},
-    {"key": "partly", "label": "Partly / not sure", "points": 1},
-    {"key": "no", "label": "No", "points": 0}
+    {
+      "key": "yes",
+      "label": "Yes",
+      "points": 2
+    },
+    {
+      "key": "partly",
+      "label": "Partly / not sure",
+      "points": 1
+    },
+    {
+      "key": "no",
+      "label": "No",
+      "points": 0
+    }
   ],
   "questions": [
     {
@@ -84,21 +96,21 @@
     {
       "key": "green",
       "min_percent": 80,
-      "label": "Ready to start your SER",
+      "label": "Audit Ready",
       "color": "#1e7d3a",
       "message": "Your foundation is solid. The main work now is writing: turning your records into clear, evidence-backed narratives."
     },
     {
       "key": "yellow",
       "min_percent": 50,
-      "label": "Close: a few gaps first",
+      "label": "Action Required / Moderate Exposure",
       "color": "#a46b00",
       "message": "You have a lot in place. Close the gaps below before you start writing so your SER doesn't stall."
     },
     {
       "key": "red",
       "min_percent": 0,
-      "label": "Build the foundation first",
+      "label": "High Commission Risk",
       "color": "#b3261e",
       "message": "Several core pieces aren't in place yet. Start with the items below; they take the longest."
     }

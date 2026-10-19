@@ -144,7 +144,7 @@ def test_submit_stores_lead_and_shows_result(client):
         assert lead.points == 18 and lead.band == "green" and lead.consent is True
         assert lead.answers == ans and lead.pilot_requested is False
     page = client.get(f"/result/{lead_id}").get_data(as_text=True)
-    assert "90%" in page and "Ready to start your SER" in page
+    assert "90%" in page and html_escape(CONTENT["bands"][0]["label"]) in page
     assert CONTENT["questions"][4]["why"] in page
     assert CONTENT["cta"]["button"] in page
 
