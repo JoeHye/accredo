@@ -1,4 +1,4 @@
-"""Admin-only, read-only: export SER Readiness Diagnostic leads to CSV.
+"""Admin-only, read-only: export SER Readiness Diagnostic leads to CSV or JSON.
 
 Run from Cloud Shell (uses your gcloud credentials via the Cloud SQL connector):
 
@@ -10,6 +10,7 @@ Options:
     --since YYYY-MM-DD   only leads created on or after this date (UTC)
     --include-test       include test leads (excluded by default: school starts with
                          "TEST" or email contains "+sertest")
+    --format csv|json    output format (default csv). JSON nests answers per lead.
     --out PATH           write here (file is created with owner-only permissions);
                          omit to print to stdout
 
@@ -80,6 +81,34 @@ def write_csv(rows, columns, question_ids, out):
     return count
 
 
+def _json_value(value):
+    if isinstance(value, datetime):
+        return value.isoformat()
+    return value
+
+
+def write_json(rows, columns, question_ids, out):
+    """Write a JSON array; each lead has the base fields plus an 'answers' object.
+
+    Values are kept raw (no spreadsheet escaping) since JSON is not opened as a sheet.
+    """
+    leads = []
+    for row in rows:
+        r = dict(zip(columns, row))
+        answers = r.get("answers") or {}
+        if isinstance(answers, str):
+            try:
+                answers = json.loads(answers)
+            except json.JSONDecodeError:
+                answers = {}
+        lead = {c: _json_value(r.get(c)) for c in BASE_COLUMNS}
+        lead["answers"] = {q: answers.get(q) for q in question_ids}
+        leads.append(lead)
+    json.dump(leads, out, indent=2, default=str)
+    out.write("\n")
+    return len(leads)
+
+
 def load_question_ids(path=CONTENT_PATH):
     with open(path, encoding="utf-8") as f:
         return [q["id"] for q in json.load(f)["questions"]]
@@ -90,6 +119,7 @@ def parse_args(argv):
     p.add_argument("--pilot-only", action="store_true")
     p.add_argument("--since", type=lambda s: datetime.strptime(s, "%Y-%m-%d"))
     p.add_argument("--include-test", action="store_true")
+    p.add_argument("--format", choices=["csv", "json"], default="csv")
     p.add_argument("--out")
     return p.parse_args(argv)
 
@@ -132,7 +162,8 @@ def main(argv=None):
             out = os.fdopen(fd, "w", newline="", encoding="utf-8")
         else:
             out = sys.stdout
-        count = write_csv(rows, columns, question_ids, out)
+        writer = write_json if args.format == "json" else write_csv
+        count = writer(rows, columns, question_ids, out)
         conn.rollback()  # read-only transaction; nothing to commit
     except Exception as e:
         sys.exit(f"ERROR: export failed ({type(e).__name__}): {e}")
@@ -143,7 +174,7 @@ def main(argv=None):
         connector.close()
 
     where = f" to {args.out}" if args.out else ""
-    print(f"OK: exported {count} lead(s){where}.", file=sys.stderr)
+    print(f"OK: exported {count} lead(s) as {args.format.upper()}{where}.", file=sys.stderr)
 
 
 if __name__ == "__main__":
