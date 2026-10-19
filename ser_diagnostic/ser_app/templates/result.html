@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="band" style="background: {{ r.band.color }}">
+  <div class="pct">{{ r.percent|round|int }}%</div>
+  <div style="font-size:20px; font-weight:600; margin-top:6px">{{ r.band.label }}</div>
+  <div style="margin-top:8px">{{ r.band.message }}</div>
+</div>
+<p class="muted">Score: {{ r.points }} of {{ r.max }} points for {{ lead.school }}.</p>
+
+{% if r.gaps %}
+  <h2>What to tackle first</h2>
+  {% for g in r.gaps %}
+    <div class="gap" style="border-left-color: {{ '#b3261e' if g.points == 0 else '#a46b00' }}">
+      <div><strong>{{ g.question.text }}</strong></div>
+      <div class="muted">You answered: {{ answer_labels.get(g.answer, g.answer) }}</div>
+      <div>{{ g.question.why }}</div>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<div class="card" style="margin-top:24px">
+  <p>{{ c.cta.pitch }}</p>
+  {% if lead.pilot_requested %}
+    <p class="notice" role="status">{{ c.cta.thanks }}</p>
+  {% else %}
+    <form method="post" action="{{ url_for('request_pilot', lead_id=lead.id) }}">
+      <button type="submit">{{ c.cta.button }}</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

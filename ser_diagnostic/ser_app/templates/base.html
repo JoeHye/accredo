@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ c.title }} | {{ c.brand }}</title>
+<style>
+  :root { --ink:#1b1f24; --muted:#5b6470; --line:#d9dee4; --bg:#f6f7f9; --card:#fff; --accent:#1f4e8c; --err:#b3261e; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:720px; margin:0 auto; padding:24px 16px 64px; }
+  header { margin-bottom:24px; }
+  .brand { color:var(--muted); font-size:14px; letter-spacing:.04em; text-transform:uppercase; }
+  h1 { font-size:28px; line-height:1.2; margin:4px 0 8px; }
+  h2 { font-size:18px; margin:28px 0 8px; color:var(--muted); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin:12px 0; }
+  fieldset { border:0; padding:0; margin:0; }
+  legend { font-weight:600; margin-bottom:8px; }
+  .opts label { display:inline-flex; align-items:center; gap:6px; margin:4px 16px 4px 0; cursor:pointer; }
+  .field { margin:12px 0; }
+  .field label { display:block; font-weight:600; margin-bottom:4px; }
+  input[type=text], input[type=email] { width:100%; padding:10px; border:1px solid var(--line); border-radius:6px; font:inherit; }
+  .err { color:var(--err); font-size:14px; margin-top:4px; }
+  .has-err { border-color:var(--err) !important; }
+  button { background:var(--accent); color:#fff; border:0; border-radius:8px; padding:12px 18px; font:inherit; font-weight:600; cursor:pointer; width:100%; }
+  .hp { position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden; }
+  .band { border-radius:10px; padding:20px; color:#fff; }
+  .band .pct { font-size:40px; font-weight:700; line-height:1; }
+  .muted { color:var(--muted); }
+  .gap { border-left:4px solid var(--line); padding-left:12px; margin:12px 0; }
+  .notice { background:#e8f3ec; border:1px solid #b9dcc6; border-radius:8px; padding:12px; }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="brand">{{ c.brand }}</div>
+  <h1>{{ c.title }}</h1>
+</header>
+{% block body %}{% endblock %}
+</main>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block body %}
+<p>{{ c.intro }}</p>
+{% if errors %}<p class="err" role="alert">Please fix the highlighted items below.</p>{% endif %}
+<form method="post" action="{{ url_for('submit') }}" novalidate>
+  {% set ns = namespace(section=None) %}
+  {% for q in c.questions %}
+    {% if q.section and q.section != ns.section %}<h2>{{ q.section }}</h2>{% set ns.section = q.section %}{% endif %}
+    <div class="card{% if errors.get(q.id) %} has-err{% endif %}">
+      <fieldset>
+        <legend>{{ loop.index }}. {{ q.text }}</legend>
+        <div class="opts">
+          {% for a in c.answers %}
+            <label><input type="radio" name="{{ q.id }}" value="{{ a.key }}" required {% if values.get(q.id) == a.key %}checked{% endif %}> {{ a.label }}</label>
+          {% endfor %}
+        </div>
+        {% if errors.get(q.id) %}<div class="err">{{ errors[q.id] }}</div>{% endif %}
+      </fieldset>
+    </div>
+  {% endfor %}
+
+  <h2>{{ c.contact_step.heading }}</h2>
+  <div class="card">
+    {% for field, label, kind in [("name", "Your name", "text"), ("email", "Work email", "email"), ("school", "School name", "text")] %}
+      <div class="field">
+        <label for="{{ field }}">{{ label }}</label>
+        <input id="{{ field }}" name="{{ field }}" type="{{ kind }}" value="{{ values.get(field, '') }}" required class="{% if errors.get(field) %}has-err{% endif %}">
+        {% if errors.get(field) %}<div class="err">{{ errors[field] }}</div>{% endif %}
+      </div>
+    {% endfor %}
+    <div class="field">
+      <label><input type="checkbox" name="consent" value="yes" required {% if values.get('consent') == 'yes' %}checked{% endif %}> {{ c.contact_step.consent }}</label>
+      {% if errors.get('consent') %}<div class="err">{{ errors['consent'] }}</div>{% endif %}
+    </div>
+    <div class="hp" aria-hidden="true"><label for="website">Leave this empty</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+  </div>
+  <button type="submit">See my results</button>
+</form>
+{% endblock %}

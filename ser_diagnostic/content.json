@@ -1,0 +1,120 @@
+{
+  "version": "1.0",
+  "brand": "Accredo",
+  "title": "SER Readiness Diagnostic",
+  "intro": "How ready is your school to write its ACCSC Self-Evaluation Report? Answer 10 quick questions (about 3 minutes) to see where you stand and what to tackle first.",
+  "answers": [
+    {"key": "yes", "label": "Yes", "points": 2},
+    {"key": "partly", "label": "Partly / not sure", "points": 1},
+    {"key": "no", "label": "No", "points": 0}
+  ],
+  "questions": [
+    {
+      "id": "q1_state_authorization",
+      "section": "Eligibility",
+      "text": "Is your school licensed or authorized to operate by your state's education agency?",
+      "why": "ACCSC only considers institutions that are legally authorized to operate in their state.",
+      "gate": true
+    },
+    {
+      "id": "q2_operating_history",
+      "section": "Eligibility",
+      "text": "Has your school been operating continuously, under the same ownership, for at least two years?",
+      "why": "ACCSC requires an operating history before an institution can apply for initial accreditation.",
+      "gate": true
+    },
+    {
+      "id": "q3_outcome_rates",
+      "section": "Outcomes and data",
+      "text": "Can you produce graduation and employment rates for each program, from your own records, for your most recent reporting period?",
+      "why": "Student achievement rates are central to ACCSC review and are compared against benchmarks.",
+      "gate": false
+    },
+    {
+      "id": "q4_employment_documentation",
+      "section": "Outcomes and data",
+      "text": "Do you keep documentation for each graduate's employment (employer, job title, start date, and how it was verified)?",
+      "why": "Reported employment has to be supported by records a reviewer can sample.",
+      "gate": false
+    },
+    {
+      "id": "q5_program_outlines",
+      "section": "Programs and faculty",
+      "text": "Does every program have a written outline with objectives, hours, and a course sequence that matches what you actually teach?",
+      "why": "Program documentation is reviewed against what is delivered during the on-site visit.",
+      "gate": false
+    },
+    {
+      "id": "q6_advisory_committees",
+      "section": "Programs and faculty",
+      "text": "Does each program have an advisory committee of industry practitioners that meets regularly and keeps minutes?",
+      "why": "Program Advisory Committees are an ACCSC requirement.",
+      "gate": false
+    },
+    {
+      "id": "q7_faculty_files",
+      "section": "Programs and faculty",
+      "text": "Do you have a file for each instructor showing qualifications and experience that meet the standard for the subjects they teach?",
+      "why": "Faculty qualification files are routinely reviewed.",
+      "gate": false
+    },
+    {
+      "id": "q8_published_policies",
+      "section": "Operations and policies",
+      "text": "Are your admissions, refund, and student complaint policies written, published to students, and applied consistently?",
+      "why": "These policies are reviewed for both their content and how consistently they are applied.",
+      "gate": false
+    },
+    {
+      "id": "q9_financial_statements",
+      "section": "Operations and policies",
+      "text": "Do you have recent financial statements prepared by an independent accountant?",
+      "why": "Financial stability is part of the accreditation review.",
+      "gate": false
+    },
+    {
+      "id": "q10_ser_lead",
+      "section": "SER process",
+      "text": "Has someone been named to lead the Self-Evaluation Report, with time set aside and staff from each area involved?",
+      "why": "The SER is a whole-institution self-study. Schools that treat it as one person's writing task usually run late.",
+      "gate": false
+    }
+  ],
+  "bands": [
+    {
+      "key": "green",
+      "min_percent": 80,
+      "label": "Ready to start your SER",
+      "color": "#1e7d3a",
+      "message": "Your foundation is solid. The main work now is writing: turning your records into clear, evidence-backed narratives."
+    },
+    {
+      "key": "yellow",
+      "min_percent": 50,
+      "label": "Close: a few gaps first",
+      "color": "#a46b00",
+      "message": "You have a lot in place. Close the gaps below before you start writing so your SER doesn't stall."
+    },
+    {
+      "key": "red",
+      "min_percent": 0,
+      "label": "Build the foundation first",
+      "color": "#b3261e",
+      "message": "Several core pieces aren't in place yet. Start with the items below; they take the longest."
+    }
+  ],
+  "gate_failed": {
+    "band": "red",
+    "label": "Not yet eligible",
+    "message": "ACCSC has eligibility requirements your school doesn't meet yet. Here's what to put in place first."
+  },
+  "cta": {
+    "pitch": "Accredo walks your team through every ACCSC standard and drafts your SER narratives from your own data.",
+    "button": "Request 1 of 5 ACCSC Fall 2026 Pilot Review Spots",
+    "thanks": "Thanks. Your pilot review request is in, and we'll be in touch."
+  },
+  "contact_step": {
+    "heading": "Almost done: tell us about you to see your results.",
+    "consent": "It's OK to contact me about my results and the Accredo pilot."
+  }
+}
