@@ -16,3 +16,4 @@ tests/
 test/
 .pytest_cache/
 *.md
+ser_diagnostic/
