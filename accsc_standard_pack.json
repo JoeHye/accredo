@@ -27,7 +27,7 @@
               "question": "In the following chart, list and provide the dates of all changes of con trol/ownership, name, location, addition of programs, separate facilities, and other substantive changes that have occurred in the last two years. Approval Date Month/Year",
               "answer_type": "table_rows",
               "required": true,
-              "table_columns": null,
+              "table_columns": ["Approval Date (Month/Year)", "Substantive Change"],
               "sub_criteria": []
             }
           ]
@@ -230,7 +230,7 @@
               "question": "Provide a list of all management, educational, and administrative staff (including corporate staff as applicable) who have been employed by the school since the date of acceptance of the Application for Initial Accreditation Part I in the following format, organized by position. Pos ition \\* The Commission may survey current employees of the school prior to the on-site evaluation.",
               "answer_type": "table_rows",
               "required": true,
-              "table_columns": null,
+              "table_columns": ["Position", "Staff Member's Name", "FT/PT", "Date Assumed Duties (Mo/Yr)", "Date Employment Ceased (Mo/Yr)", "# of Years Employed", "Reason for Employment Ceased", "Email Address (current employees only)"],
               "sub_criteria": []
             },
             {
@@ -455,7 +455,7 @@
               "question": "If applicable, provide the school's three (3) most recent years final cohort default rates in the chart below. Year: Year: Year: If the most recent of these rates is above the U. S. Department of Education threshold or if the rate has increased year over year, explain the circumstances that caused this rate or rate increase and describe the initiatives to improve the rates.",
               "answer_type": "table_rows",
               "required": true,
-              "table_columns": null,
+              "table_columns": ["Fiscal Year", "Cohort Default Rate (%)"],
               "sub_criteria": []
             }
           ]
@@ -1291,7 +1291,7 @@
               "question": "Provide a list of all faculty members who have been employed by the school since the date of the acceptance of the Application for Initial Accreditation-Part I in the following format, organized by position. Pos ition \\*The Commission may survey the school's current faculty members prior to the on-site evaluation.",
               "answer_type": "table_rows",
               "required": true,
-              "table_columns": null,
+              "table_columns": ["Position", "Faculty Member's Name", "FT/PT", "Date Assumed Duties (Mo/Yr)", "Date Employment Ceased (Mo/Yr)", "# of Years Employed", "Reason for Employment Ceased", "Email Address (current faculty only)"],
               "sub_criteria": []
             }
           ]
@@ -1885,7 +1885,7 @@
               "question": "Describe how the school continually monitors and addresses student satisfaction and student needs for services as a means to support students in achieving successful outcomes. Complete the following chart to show the respective student services available to students including the designated school personnel responsible for these areas (mark all that apply): Staff / Position Relevant coping skills General Higher. Ed. Development Student retention strategies Academic Advising Testing Services Tutoring Services Attendance Monitoring Leave s of Absences Graduate Employment Assistance Housing Information Transportation Information Child Care Information Other \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610 \u2610",
               "answer_type": "table_rows",
               "required": true,
-              "table_columns": null,
+              "table_columns": ["Staff / Position", "Relevant Coping Skills", "General Higher Ed. Development", "Student Retention Strategies", "Academic Advising", "Testing Services", "Tutoring Services", "Attendance Monitoring", "Leaves of Absence", "Graduate Employment Assistance", "Housing Information", "Transportation Information", "Child Care Information", "Other"],
               "sub_criteria": []
             }
           ]
