@@ -671,18 +671,52 @@ function createCriterionCard(crit, copySources) {
     return card;
 }
 
+// Turn a failed API response into a readable message. Handles JSON error bodies
+// ({error, code}) and non-JSON bodies (e.g. an HTML error page from a proxy).
+async function readApiError(response, fallback) {
+    let body = null;
+    try {
+        body = await response.json();
+    } catch (_) {
+        body = null;
+    }
+    const byStatus = {
+        401: "Your session has expired. Please log in again.",
+        403: "You don't have access to these attachments.",
+        404: "This item could not be found.",
+        413: "That file is too large. Files must be 25 MB or smaller.",
+        503: "The service is temporarily unavailable. Please try again in a minute."
+    };
+    const message = (body && (body.error || body.message)) || byStatus[response.status] || `${fallback} (HTTP ${response.status})`;
+    const err = new Error(message);
+    err.status = response.status;
+    err.code = body && body.code;
+    return err;
+}
+
 async function loadExhibits(appId, criterionId) {
     const container = document.getElementById(`exhibit-container-${criterionId}`);
     if (!container) return;
 
+    container.innerHTML = `<div style="font-size: 12px; color: #64748b;">Loading attachments…</div>`;
+    let files;
     try {
         const res = await fetch(`/api/applications/${appId}/responses/${criterionId}/exhibit`);
-        if (!res.ok) throw new Error("Failed to load exhibits");
-        const files = await res.json();
-        renderExhibitEditor(appId, criterionId, files || []);
+        if (!res.ok) throw await readApiError(res, "Attachments could not be loaded");
+        files = await res.json();
+        if (!Array.isArray(files)) throw new Error("Unexpected response from the server.");
     } catch (err) {
-        container.innerHTML = `<p style="color: red; font-size: 12px;">Error loading attachments: ${err.message}</p>`;
+        // fetch() rejects with a TypeError when the request never reached the server.
+        const message = err && err.name === "TypeError" ? "Network error. Check your connection and try again." : err.message;
+        console.error(`Loading exhibits failed for ${criterionId}:`, err);
+        container.innerHTML = `
+            <div role="alert" style="font-size: 12px; color: #b91c1c; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <span>Couldn't load attachments: ${escapeHtml(message)}</span>
+                <button type="button" onclick="loadExhibits('${appId}', '${criterionId}')" style="padding: 2px 8px; border: 1px solid #b91c1c; background: white; color: #b91c1c; border-radius: 4px; font-size: 12px; cursor: pointer;">Retry</button>
+            </div>`;
+        return;
     }
+    renderExhibitEditor(appId, criterionId, files);
 }
 
 function renderExhibitEditor(appId, criterionId, files) {
@@ -738,9 +772,8 @@ async function uploadExhibit(appId, criterionId) {
             body: formData
         });
 
-        const result = await response.json();
         if (!response.ok) {
-            throw new Error(result.error || result.details || "Exhibit upload failed");
+            throw await readApiError(response, "Exhibit upload failed");
         }
 
         if (statusDiv) {
@@ -776,9 +809,8 @@ async function deleteExhibit(appId, criterionId, evidenceId) {
             method: "DELETE"
         });
 
-        const result = await response.json();
         if (!response.ok) {
-            throw new Error(result.error || result.details || "Failed to delete exhibit");
+            throw await readApiError(response, "Failed to delete exhibit");
         }
 
         if (statusDiv) {
