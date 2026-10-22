@@ -671,18 +671,52 @@ function createCriterionCard(crit, copySources) {
     return card;
 }
 
+// Turn a failed API response into a readable message. Handles JSON error bodies
+// ({error, code}) and non-JSON bodies (e.g. an HTML error page from a proxy).
+async function readApiError(response, fallback) {
+    let body = null;
+    try {
+        body = await response.json();
+    } catch (_) {
+        body = null;
+    }
+    const byStatus = {
+        401: "Your session has expired. Please log in again.",
+        403: "You don't have access to these attachments.",
+        404: "This item could not be found.",
+        413: "That file is too large. Files must be 25 MB or smaller.",
+        503: "The service is temporarily unavailable. Please try again in a minute."
+    };
+    const message = (body && (body.error || body.message)) || byStatus[response.status] || `${fallback} (HTTP ${response.status})`;
+    const err = new Error(message);
+    err.status = response.status;
+    err.code = body && body.code;
+    return err;
+}
+
 async function loadExhibits(appId, criterionId) {
     const container = document.getElementById(`exhibit-container-${criterionId}`);
     if (!container) return;
 
+    container.innerHTML = `<div style="font-size: 12px; color: #64748b;">Loading attachments…</div>`;
+    let files;
     try {
         const res = await fetch(`/api/applications/${appId}/responses/${criterionId}/exhibit`);
-        if (!res.ok) throw new Error("Failed to load exhibits");
-        const files = await res.json();
-        renderExhibitEditor(appId, criterionId, files || []);
+        if (!res.ok) throw await readApiError(res, "Attachments could not be loaded");
+        files = await res.json();
+        if (!Array.isArray(files)) throw new Error("Unexpected response from the server.");
     } catch (err) {
-        container.innerHTML = `<p style="color: red; font-size: 12px;">Error loading attachments: ${err.message}</p>`;
+        // fetch() rejects with a TypeError when the request never reached the server.
+        const message = err && err.name === "TypeError" ? "Network error. Check your connection and try again." : err.message;
+        console.error(`Loading exhibits failed for ${criterionId}:`, err);
+        container.innerHTML = `
+            <div role="alert" style="font-size: 12px; color: #b91c1c; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <span>Couldn't load attachments: ${escapeHtml(message)}</span>
+                <button type="button" onclick="loadExhibits('${appId}', '${criterionId}')" style="padding: 2px 8px; border: 1px solid #b91c1c; background: white; color: #b91c1c; border-radius: 4px; font-size: 12px; cursor: pointer;">Retry</button>
+            </div>`;
+        return;
     }
+    renderExhibitEditor(appId, criterionId, files);
 }
 
 function renderExhibitEditor(appId, criterionId, files) {
@@ -738,9 +772,8 @@ async function uploadExhibit(appId, criterionId) {
             body: formData
         });
 
-        const result = await response.json();
         if (!response.ok) {
-            throw new Error(result.error || result.details || "Exhibit upload failed");
+            throw await readApiError(response, "Exhibit upload failed");
         }
 
         if (statusDiv) {
@@ -776,9 +809,8 @@ async function deleteExhibit(appId, criterionId, evidenceId) {
             method: "DELETE"
         });
 
-        const result = await response.json();
         if (!response.ok) {
-            throw new Error(result.error || result.details || "Failed to delete exhibit");
+            throw await readApiError(response, "Failed to delete exhibit");
         }
 
         if (statusDiv) {
@@ -871,23 +903,49 @@ async function draftAnswer(criterionId) {
     }
 }
 
+// ---------- Table answers (table_rows) ----------
+// Columns are kept per criterion in memory (not embedded in onclick attributes),
+// and inputs are matched by column position, so column names with quotes or
+// symbols (e.g. "Staff Member's Name", "# of Years Employed") are safe.
+const tableColumnsByCriterion = {};
+const tableSaveState = {};
+const TABLE_AUTOSAVE_DELAY_MS = 1500;
+
 async function loadTableRows(appId, criterionId, columns) {
     const container = document.getElementById(`table-container-${criterionId}`);
     if (!container) return;
 
+    container.innerHTML = `<div style="font-size: 12px; color: #64748b;">Loading table…</div>`;
+    let data;
     try {
         const res = await fetch(`/api/applications/${appId}/responses/${criterionId}/table-rows`);
-        if (!res.ok) throw new Error("Failed to load table data");
-        const data = await res.json();
-        renderTableEditor(appId, criterionId, columns || data.table_columns || [], data.rows || []);
+        if (!res.ok) throw await readApiError(res, "The table could not be loaded");
+        data = await res.json();
     } catch (err) {
-        container.innerHTML = `<p style="color: red; font-size: 12px;">Error loading table: ${err.message}</p>`;
+        const message = err && err.name === "TypeError" ? "Network error. Check your connection and try again." : err.message;
+        console.error(`Loading table rows failed for ${criterionId}:`, err);
+        container.innerHTML = `
+            <div role="alert" style="font-size: 12px; color: #b91c1c; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <span>Couldn't load table: ${escapeHtml(message)}</span>
+                <button type="button" onclick="loadTableRows('${appId}', '${criterionId}')" style="padding: 2px 8px; border: 1px solid #b91c1c; background: white; color: #b91c1c; border-radius: 4px; font-size: 12px; cursor: pointer;">Retry</button>
+            </div>`;
+        return;
     }
+    const cols = (Array.isArray(columns) && columns.length) ? columns
+        : (Array.isArray(data.table_columns) ? data.table_columns : []);
+    renderTableEditor(appId, criterionId, cols, Array.isArray(data.rows) ? data.rows : []);
 }
 
 function renderTableEditor(appId, criterionId, columns, rows) {
     const container = document.getElementById(`table-container-${criterionId}`);
     if (!container) return;
+
+    if (!Array.isArray(columns) || columns.length === 0) {
+        // Without columns there is nothing to type into; say so instead of showing locked rows.
+        container.innerHTML = `<div role="alert" style="font-size: 12px; color: #b91c1c;">This table has no columns configured yet, so it can't be edited. Please contact support.</div>`;
+        return;
+    }
+    tableColumnsByCriterion[criterionId] = columns;
 
     let html = `
         <div style="overflow-x: auto; margin-bottom: 10px;">
@@ -896,7 +954,7 @@ function renderTableEditor(appId, criterionId, columns, rows) {
                     <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
     `;
     columns.forEach(col => {
-        html += `<th style="padding: 8px; text-align: left; border: 1px solid #cbd5e1; color: #334155;">${col}</th>`;
+        html += `<th style="padding: 8px; text-align: left; border: 1px solid #cbd5e1; color: #334155;">${escapeHtml(col)}</th>`;
     });
     html += `<th style="padding: 8px; text-align: center; border: 1px solid #cbd5e1; width: 60px;">Action</th></tr></thead><tbody>`;
 
@@ -911,76 +969,137 @@ function renderTableEditor(appId, criterionId, columns, rows) {
     html += `</tbody></table></div>`;
     html += `
         <div style="display: flex; gap: 10px; align-items: center;">
-            <button type="button" onclick="addTableRow('${criterionId}', ${JSON.stringify(columns).replace(/"/g, '&quot;')})" style="padding: 6px 12px; background: #e2e8f0; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; color: #334155;">+ Add Row</button>
-            <button type="button" onclick="saveTableRows('${appId}', '${criterionId}', ${JSON.stringify(columns).replace(/"/g, '&quot;')})" style="padding: 6px 14px; background: #3b82f6; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; color: white;">Save Table</button>
+            <button type="button" onclick="addTableRow('${criterionId}')" style="padding: 6px 12px; background: #e2e8f0; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; color: #334155;">+ Add Row</button>
+            <button type="button" onclick="saveTableRows('${appId}', '${criterionId}')" style="padding: 6px 14px; background: #3b82f6; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; color: white;">Save Table</button>
         </div>
     `;
 
     container.innerHTML = html;
+
+    // Autosave: typing schedules a save; leaving a cell saves immediately if anything changed.
+    const table = document.getElementById(`table-elem-${criterionId}`);
+    if (table) {
+        table.addEventListener("input", (e) => {
+            if (e.target && e.target.matches && e.target.matches("input[data-col-index]")) {
+                scheduleTableSave(appId, criterionId);
+            }
+        });
+        table.addEventListener("focusout", (e) => {
+            const state = tableSaveState[criterionId];
+            if (state && state.dirty && e.target && e.target.matches && e.target.matches("input[data-col-index]")) {
+                saveTableRows(appId, criterionId);
+            }
+        });
+    }
 }
 
 function generateTableRowHtml(columns, rowData) {
     let rowHtml = `<tr style="border-bottom: 1px solid #e2e8f0;">`;
-    columns.forEach(col => {
-        const val = rowData[col] !== undefined ? rowData[col] : "";
-        rowHtml += `<td style="padding: 6px; border: 1px solid #cbd5e1;"><input type="text" data-column="${col}" value="${escapeHtml(val)}" style="width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 3px; font-size: 12px; box-sizing: border-box;" /></td>`;
+    columns.forEach((col, i) => {
+        const val = rowData[col] !== undefined && rowData[col] !== null ? rowData[col] : "";
+        rowHtml += `<td style="padding: 6px; border: 1px solid #cbd5e1;"><input type="text" data-col-index="${i}" aria-label="${escapeHtml(col)}" value="${escapeHtml(val)}" style="width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 3px; font-size: 12px; box-sizing: border-box;" /></td>`;
     });
-    rowHtml += `<td style="padding: 6px; border: 1px solid #cbd5e1; text-align: center;"><button type="button" onclick="this.closest('tr').remove()" style="background: none; border: none; color: #dc2626; cursor: pointer; font-weight: bold; font-size: 14px;" title="Delete Row">&times;</button></td>`;
+    rowHtml += `<td style="padding: 6px; border: 1px solid #cbd5e1; text-align: center;"><button type="button" onclick="removeTableRow(this)" style="background: none; border: none; color: #dc2626; cursor: pointer; font-weight: bold; font-size: 14px;" title="Delete Row" aria-label="Delete row">&times;</button></td>`;
     rowHtml += `</tr>`;
     return rowHtml;
 }
 
-function addTableRow(criterionId, columns) {
+function addTableRow(criterionId, legacyColumns) {
+    const columns = tableColumnsByCriterion[criterionId] || legacyColumns || [];
     const tbody = document.querySelector(`#table-elem-${criterionId} tbody`);
-    if (!tbody) return;
-    const tr = document.createElement("tr");
-    tr.style.borderBottom = "1px solid #e2e8f0";
-    let trHtml = "";
-    columns.forEach(col => {
-        trHtml += `<td style="padding: 6px; border: 1px solid #cbd5e1;"><input type="text" data-column="${col}" value="" style="width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 3px; font-size: 12px; box-sizing: border-box;" /></td>`;
-    });
-    trHtml += `<td style="padding: 6px; border: 1px solid #cbd5e1; text-align: center;"><button type="button" onclick="this.closest('tr').remove()" style="background: none; border: none; color: #dc2626; cursor: pointer; font-weight: bold; font-size: 14px;" title="Delete Row">&times;</button></td>`;
-    tr.innerHTML = trHtml;
-    tbody.appendChild(tr);
+    if (!tbody || columns.length === 0) return;
+    tbody.insertAdjacentHTML("beforeend", generateTableRowHtml(columns, {}));
+    const newRow = tbody.lastElementChild;
+    const firstInput = newRow && newRow.querySelector("input[data-col-index]");
+    if (firstInput) firstInput.focus();
 }
 
-async function saveTableRows(appId, criterionId, columns) {
-    const statusDiv = document.getElementById(`status-${criterionId}`);
+function removeTableRow(button) {
+    const tr = button.closest("tr");
+    const table = button.closest("table");
+    if (!tr || !table) return;
+    const criterionId = table.id.replace(/^table-elem-/, "");
+    const appId = typeof applicationId !== "undefined" ? applicationId : null;
+    tr.remove();
+    if (appId !== null) saveTableRows(appId, criterionId);
+}
+
+function collectTableRows(criterionId) {
+    const columns = tableColumnsByCriterion[criterionId] || [];
     const tbody = document.querySelector(`#table-elem-${criterionId} tbody`);
-    if (!statusDiv || !tbody) return;
-
-    statusDiv.className = "save-indicator save-saving";
-    statusDiv.textContent = "Saving...";
-
+    if (!tbody) return null;
     const rows = [];
-    const trs = tbody.querySelectorAll("tr");
-    trs.forEach(tr => {
+    tbody.querySelectorAll("tr").forEach(tr => {
         const rowData = {};
-        columns.forEach(col => {
-            const input = tr.querySelector(`input[data-column="${col}"]`);
+        columns.forEach((col, i) => {
+            const input = tr.querySelector(`input[data-col-index="${i}"]`);
             rowData[col] = input ? input.value : "";
         });
         rows.push(rowData);
     });
+    return rows;
+}
+
+function scheduleTableSave(appId, criterionId) {
+    const state = (tableSaveState[criterionId] ||= {});
+    state.dirty = true;
+    const statusDiv = document.getElementById(`status-${criterionId}`);
+    if (statusDiv && !state.inFlight) {
+        statusDiv.className = "save-indicator save-saving";
+        statusDiv.textContent = "Unsaved changes…";
+    }
+    clearTimeout(state.timer);
+    state.timer = setTimeout(() => saveTableRows(appId, criterionId), TABLE_AUTOSAVE_DELAY_MS);
+}
+
+// Saves are serialized per table: a save requested while one is in flight runs once afterwards.
+async function saveTableRows(appId, criterionId) {
+    const state = (tableSaveState[criterionId] ||= {});
+    clearTimeout(state.timer);
+    if (state.inFlight) {
+        state.pending = true;
+        return state.inFlight;
+    }
+    const rows = collectTableRows(criterionId);
+    if (rows === null) return;
+    state.dirty = false;
+
+    const statusDiv = document.getElementById(`status-${criterionId}`);
+    const setStatus = (cls, text) => {
+        if (statusDiv) {
+            statusDiv.className = `save-indicator ${cls}`;
+            statusDiv.textContent = text;
+        }
+    };
+    setStatus("save-saving", "Saving…");
+
+    state.inFlight = (async () => {
+        try {
+            const response = await fetch(`/api/applications/${appId}/responses/${criterionId}/table-rows`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ rows })
+            });
+            if (!response.ok) throw await readApiError(response, "Save failed");
+            const result = await response.json();
+            setStatus("save-success", `Saved at ${new Date(result.saved_at || Date.now()).toLocaleTimeString()}`);
+            loadCompleteness();
+            loadSubsections();
+        } catch (err) {
+            state.dirty = true;  // keep the edits marked unsaved so leaving a cell retries
+            const message = err && err.name === "TypeError" ? "network error" : err.message;
+            setStatus("save-error", `Save failed — ${message}. Your edits are still on screen; click Save Table to retry.`);
+        }
+    })();
 
     try {
-        const response = await fetch(`/api/applications/${appId}/responses/${criterionId}/table-rows`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ rows })
-        });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || "Save failed");
-
-        statusDiv.className = "save-indicator save-success";
-        statusDiv.textContent = `Saved at ${new Date(result.saved_at).toLocaleTimeString()}`;
-
-        loadCompleteness();
-        loadSubsections();
-    } catch (err) {
-        statusDiv.className = "save-indicator save-error";
-        statusDiv.textContent = `Save failed — retry (${err.message})`;
+        await state.inFlight;
+    } finally {
+        state.inFlight = null;
+        if (state.pending) {
+            state.pending = false;
+            await saveTableRows(appId, criterionId);
+        }
     }
 }
 

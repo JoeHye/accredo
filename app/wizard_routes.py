@@ -77,6 +77,22 @@ def check_edit_permission(application_id, section_code, subsection_code):
         return False, jsonify({"error": "Forbidden", "message": "This section is assigned to another team member"}), 403
     return True, None, None
 
+TABLE_MAX_ROWS = 500
+TABLE_MAX_CELL_CHARS = 2000
+
+
+def table_row_has_data(row_data):
+    """A table row counts only if at least one cell has non-blank text."""
+    return isinstance(row_data, dict) and any(
+        isinstance(v, str) and v.strip() for v in row_data.values())
+
+
+def table_has_data(response_id):
+    """Shared completeness rule for table_rows answers, used by every completion aggregator."""
+    rows = TableRowData.query.filter_by(response_id=response_id).all()
+    return any(table_row_has_data(r.row_data) for r in rows)
+
+
 def calculate_completeness(application_id):
     app_record = Application.query.get(application_id)
     if not app_record:
@@ -123,7 +139,7 @@ def calculate_completeness(application_id):
 
         has_table_rows = False
         if c.answer_type == "table_rows" and resp:
-            has_table_rows = TableRowData.query.filter_by(response_id=resp.id).count() > 0
+            has_table_rows = table_has_data(resp.id)
 
         is_complete = has_narrative or is_sub_na or criterion_na or has_exhibit or has_table_rows
 
@@ -429,7 +445,7 @@ def get_subsections(application_id):
 
                 has_table_rows = False
                 if c.answer_type == "table_rows" and resp:
-                    has_table_rows = TableRowData.query.filter_by(response_id=resp.id).count() > 0
+                    has_table_rows = table_has_data(resp.id)
 
                 if has_narrative or is_na or has_exhibit or has_table_rows:
                     answered_count += 1
@@ -612,14 +628,18 @@ def get_table_rows(application_id, criterion_id):
 
     except Exception as e:
         logger.error(f"Error fetching table rows for app {application_id}, criterion {criterion_id}: {str(e)}", exc_info=True)
-        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+        return jsonify({"error": "The table could not be loaded. Please refresh and try again.", "code": "internal_error"}), 500
 
 
 @wizard_bp.route("/api/applications/<int:application_id>/responses/<criterion_id>/table-rows", methods=["PUT"])
 @login_required
 def save_table_rows(application_id, criterion_id):
-    data = request.get_json() or {}
-    rows_data = data.get("rows", [])
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict) or not isinstance(data.get("rows"), list):
+        return jsonify({"error": "Request body must be JSON with a 'rows' list.", "code": "invalid_payload"}), 400
+    rows_data = data["rows"]
+    if len(rows_data) > TABLE_MAX_ROWS:
+        return jsonify({"error": f"A table can have at most {TABLE_MAX_ROWS} rows.", "code": "too_many_rows"}), 400
 
     try:
         app_record, err_resp, err_code = verify_application_ownership(application_id)
@@ -635,7 +655,37 @@ def save_table_rows(application_id, criterion_id):
             return edit_resp, edit_code
 
         if criterion.answer_type != "table_rows":
-            return jsonify({"error": "Criterion answer_type is not table_rows"}), 400
+            return jsonify({"error": "This question does not accept table rows.", "code": "not_a_table_criterion"}), 400
+
+        columns = criterion.table_columns or []
+        if not columns:
+            logger.error(f"Table criterion {criterion_id} has no table_columns configured; cannot save rows")
+            return jsonify({"error": "This table has no columns configured. Please contact support.",
+                            "code": "table_not_configured"}), 422
+
+        clean_rows = []
+        for i, row in enumerate(rows_data, start=1):
+            if not isinstance(row, dict):
+                return jsonify({"error": f"Row {i} is not valid.", "code": "invalid_row"}), 400
+            unknown = set(row) - set(columns)
+            if unknown:
+                return jsonify({"error": f"Row {i} has unknown column(s): {', '.join(sorted(unknown))}.",
+                                "code": "unknown_column"}), 400
+            cleaned = {}
+            for col in columns:
+                value = row.get(col, "")
+                if value is None:
+                    value = ""
+                if isinstance(value, (int, float)) and not isinstance(value, bool):
+                    value = str(value)
+                if not isinstance(value, str):
+                    return jsonify({"error": f"Row {i}, column '{col}' must be text.", "code": "invalid_cell"}), 400
+                if len(value) > TABLE_MAX_CELL_CHARS:
+                    return jsonify({"error": f"Row {i}, column '{col}' is longer than {TABLE_MAX_CELL_CHARS} characters.",
+                                    "code": "cell_too_long"}), 400
+                cleaned[col] = value
+            if table_row_has_data(cleaned):  # fully blank rows are not stored
+                clean_rows.append(cleaned)
 
         resp = Response.query.filter_by(
             application_id=application_id,
@@ -658,7 +708,7 @@ def save_table_rows(application_id, criterion_id):
         TableRowData.query.filter_by(response_id=resp.id).delete()
 
         saved_rows = []
-        for idx, row_dict in enumerate(rows_data):
+        for idx, row_dict in enumerate(clean_rows):
             new_row = TableRowData(
                 response_id=resp.id,
                 row_index=idx,
@@ -677,17 +727,18 @@ def save_table_rows(application_id, criterion_id):
         return jsonify({
             "criterion_id": criterion_id,
             "rows": saved_rows,
+            "complete": len(saved_rows) > 0,
             "saved_at": now.isoformat()
         }), 200
 
     except SQLAlchemyError as e:
         db.session.rollback()
         logger.error(f"Database error during table rows update (app {application_id}, criterion {criterion_id}): {str(e)}", exc_info=True)
-        return jsonify({"error": "Database error during save", "details": str(e)}), 500
+        return jsonify({"error": "The table could not be saved. Please try again.", "code": "database_error"}), 500
     except Exception as e:
         db.session.rollback()
         logger.error(f"Unexpected error during table rows update (app {application_id}, criterion {criterion_id}): {str(e)}", exc_info=True)
-        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+        return jsonify({"error": "The table could not be saved. Please try again.", "code": "internal_error"}), 500
 
 
 @wizard_bp.route("/api/applications/<int:application_id>/responses/<criterion_id>/draft", methods=["POST"])
