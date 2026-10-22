@@ -6,8 +6,10 @@ into criteria whose table_columns are currently empty. It never overwrites exist
 columns. Dry run by default.
 
 "Empty" covers every form the app can leave behind: SQL NULL, JSON null ('null'::jsonb, which is
-what SQLAlchemy's JSONB column writes for Python None), '[]', and '""'. The UPDATE re-checks the
-same condition by primary key, so a value that changed since the SELECT is never overwritten.
+what SQLAlchemy's JSONB column writes for Python None), '[]', and '""'. That decision is made once,
+in Python, on the selected rows. The SELECT takes row locks (FOR UPDATE), so the UPDATE can target
+the primary key alone: no JSONB condition in its WHERE clause can evaluate differently in Postgres,
+and no other writer can change a locked row between the check and the write.
 
 Run from Cloud Shell (uses your gcloud credentials via the Cloud SQL connector):
 
@@ -47,12 +49,11 @@ def pack_table_columns(pack):
     return found
 
 
-# One definition of "empty" shared by the SELECT report and the UPDATE guard.
-EMPTY_COLUMNS_SQL = ("(table_columns IS NULL OR jsonb_typeof(table_columns) = 'null' "
-                     "OR table_columns = '[]'::jsonb OR table_columns = '\"\"'::jsonb)")
+# FOR UPDATE locks the selected rows until commit/rollback, so the plan made from them stays true.
 SELECT_SQL = ("SELECT id, table_columns, COALESCE(jsonb_typeof(table_columns), 'SQL NULL') FROM criteria "
-              "WHERE answer_type = 'table_rows' AND id IN ({placeholders})")
-UPDATE_SQL = f"UPDATE criteria SET table_columns = CAST(%s AS JSONB) WHERE id = %s AND {EMPTY_COLUMNS_SQL}"
+              "WHERE answer_type = 'table_rows' AND id IN ({placeholders}) FOR UPDATE")
+# Primary key only: the emptiness check already happened in plan_updates on the locked rows.
+UPDATE_SQL = "UPDATE criteria SET table_columns = CAST(%s AS JSONB) WHERE id = %s"
 
 
 def plan_updates(pack_cols, db_rows):
@@ -81,7 +82,8 @@ def run_backfill(conn, pack_cols, apply, out=print):
     """Plan and (optionally) apply against an open DB-API connection with %s placeholders.
 
     Everything runs in one transaction: a dry run rolls back; an apply commits only if every
-    planned row was updated, otherwise it raises and the caller rolls back.
+    planned row was updated (exactly one row per primary key), otherwise it raises and the
+    caller rolls back.
     Returns the number of criteria updated (or that would be updated).
     """
     cur = conn.cursor()
@@ -102,13 +104,15 @@ def run_backfill(conn, pack_cols, apply, out=print):
         conn.rollback()
         out(f"DRY RUN: {len(to_update)} criteria would be updated. Re-run with --apply to write.")
         return len(to_update)
+    updated = []
     for t in to_update:
         cur.execute(UPDATE_SQL, (json.dumps(t["columns"]), t["id"]))
         if cur.rowcount != 1:
             raise RuntimeError(f"expected to update 1 row for {t['id']} "
                                f"(stored as {stored_as.get(t['id'])}), updated {cur.rowcount}")
+        updated.append(t["id"])
     conn.commit()
-    out(f"OK: updated {len(to_update)} criteria.")
+    out(f"OK: updated {len(updated)} criteria: {', '.join(updated)}.")
     return len(to_update)
 
 

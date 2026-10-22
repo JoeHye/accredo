@@ -67,7 +67,7 @@ def stored(conn):
 
 
 def test_orm_none_is_stored_as_json_null_and_old_guard_missed_it(pg):
-    """Reproduces the production error: the previous UPDATE guard matched 0 rows for JSON null."""
+    """Reproduces the production error: the old guarded UPDATE matched 0 rows for JSON null."""
     assert stored(pg)["0-A-2"] == (None, "null")
     cur = pg.cursor()
     cur.execute("UPDATE criteria SET table_columns = '[\"x\"]'::jsonb "
@@ -106,8 +106,35 @@ def test_apply_never_overwrites_real_columns(pg):
     assert stored(pg)["VI-A-5"] == (["Hand set"], "array")
 
 
-def test_row_changed_between_select_and_update_aborts_whole_apply(pg, monkeypatch):
-    """If the guard stops matching (value changed after the SELECT), nothing is committed."""
+def test_update_by_primary_key_matches_json_null_row(pg):
+    """The new id-only UPDATE hits exactly the row the old guarded UPDATE missed."""
+    cur = pg.cursor()
+    cur.execute(backfill.UPDATE_SQL, (json.dumps(["x"]), "0-A-2"))
+    assert cur.rowcount == 1
+    pg.rollback()
+
+
+def test_select_locks_rows_so_a_concurrent_writer_waits(pg, pg_uri):
+    """FOR UPDATE: another session cannot change a planned row until the backfill commits."""
+    import psycopg2
+    pack_cols = backfill.pack_table_columns(json.load(open(INITIAL)))
+    cur = pg.cursor()
+    cur.execute(backfill.SELECT_SQL.format(placeholders=", ".join(["%s"] * len(FIVE))), FIVE)
+    other = psycopg2.connect(pg_uri)
+    try:
+        ocur = other.cursor()
+        ocur.execute("SET lock_timeout = '200ms'")
+        with pytest.raises(psycopg2.errors.LockNotAvailable):
+            ocur.execute("""UPDATE criteria SET table_columns = '["Hand set"]'::jsonb WHERE id = '0-A-2'""")
+        other.rollback()
+    finally:
+        other.close()
+    pg.rollback()
+    assert backfill.run_backfill(pg, pack_cols, apply=True, out=lambda _: None) == 5
+
+
+def test_planned_row_not_updated_aborts_whole_apply(pg, monkeypatch):
+    """If any planned row is not updated, nothing is committed."""
     pack_cols = backfill.pack_table_columns(json.load(open(INITIAL)))
     monkeypatch.setattr(backfill, "UPDATE_SQL", backfill.UPDATE_SQL + " AND false")
     with pytest.raises(RuntimeError, match="expected to update 1 row for 0-A-2"):
