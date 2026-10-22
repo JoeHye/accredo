@@ -46,3 +46,8 @@ def test_malformed_dburl_never_echoed(monkeypatch):
     with pytest.raises(SystemExit) as e:
         backfill.main([])
     assert "values not shown" in str(e.value) and "onlyuser" not in str(e.value)
+
+
+def test_empty_string_and_json_text_forms_count_as_empty():
+    to_update, _ = backfill.plan_updates({"a": COLS, "b": COLS}, {"a": "", "b": "null"})
+    assert [t["id"] for t in to_update] == ["a", "b"]

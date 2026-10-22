@@ -2,8 +2,12 @@
 
 The loader skips a StandardPack that already exists, so fixes to a pack JSON never reach a
 database that loaded the old version. This copies non-empty table_columns from the pack JSON
-into criteria whose table_columns are currently NULL or empty. It never overwrites existing
+into criteria whose table_columns are currently empty. It never overwrites existing
 columns. Dry run by default.
+
+"Empty" covers every form the app can leave behind: SQL NULL, JSON null ('null'::jsonb, which is
+what SQLAlchemy's JSONB column writes for Python None), '[]', and '""'. The UPDATE re-checks the
+same condition by primary key, so a value that changed since the SELECT is never overwritten.
 
 Run from Cloud Shell (uses your gcloud credentials via the Cloud SQL connector):
 
@@ -43,6 +47,14 @@ def pack_table_columns(pack):
     return found
 
 
+# One definition of "empty" shared by the SELECT report and the UPDATE guard.
+EMPTY_COLUMNS_SQL = ("(table_columns IS NULL OR jsonb_typeof(table_columns) = 'null' "
+                     "OR table_columns = '[]'::jsonb OR table_columns = '\"\"'::jsonb)")
+SELECT_SQL = ("SELECT id, table_columns, COALESCE(jsonb_typeof(table_columns), 'SQL NULL') FROM criteria "
+              "WHERE answer_type = 'table_rows' AND id IN ({placeholders})")
+UPDATE_SQL = f"UPDATE criteria SET table_columns = CAST(%s AS JSONB) WHERE id = %s AND {EMPTY_COLUMNS_SQL}"
+
+
 def plan_updates(pack_cols, db_rows):
     """db_rows: {criterion_id: current_columns_or_None}. Returns (to_update, skipped) lists of dicts."""
     to_update, skipped = [], []
@@ -56,13 +68,48 @@ def plan_updates(pack_cols, db_rows):
                 current = json.loads(current)
             except json.JSONDecodeError:
                 current = None
-        if not current:
+        if not current:  # None (SQL NULL or JSON null), [], or ""
             to_update.append({"id": cid, "columns": cols})
         elif current != cols:
             skipped.append({"id": cid, "reason": "already has different columns; left unchanged", "current": current})
         else:
             skipped.append({"id": cid, "reason": "already correct"})
     return to_update, skipped
+
+
+def run_backfill(conn, pack_cols, apply, out=print):
+    """Plan and (optionally) apply against an open DB-API connection with %s placeholders.
+
+    Everything runs in one transaction: a dry run rolls back; an apply commits only if every
+    planned row was updated, otherwise it raises and the caller rolls back.
+    Returns the number of criteria updated (or that would be updated).
+    """
+    cur = conn.cursor()
+    ids = sorted(pack_cols)
+    cur.execute(SELECT_SQL.format(placeholders=", ".join(["%s"] * len(ids))), ids)
+    fetched = cur.fetchall()
+    db_rows = {row[0]: row[1] for row in fetched}
+    stored_as = {row[0]: row[2] for row in fetched}
+    to_update, skipped = plan_updates(pack_cols, db_rows)
+
+    for s in skipped:
+        out(f"skip   {s['id']}: {s['reason']}")
+    for t in to_update:
+        verb = "UPDATE" if apply else "would update"
+        out(f"{verb} {t['id']} (currently stored as {stored_as.get(t['id'])}): {len(t['columns'])} columns -> {t['columns']}")
+
+    if not apply:
+        conn.rollback()
+        out(f"DRY RUN: {len(to_update)} criteria would be updated. Re-run with --apply to write.")
+        return len(to_update)
+    for t in to_update:
+        cur.execute(UPDATE_SQL, (json.dumps(t["columns"]), t["id"]))
+        if cur.rowcount != 1:
+            raise RuntimeError(f"expected to update 1 row for {t['id']} "
+                               f"(stored as {stored_as.get(t['id'])}), updated {cur.rowcount}")
+    conn.commit()
+    out(f"OK: updated {len(to_update)} criteria.")
+    return len(to_update)
 
 
 def main(argv=None):
@@ -97,30 +144,7 @@ def main(argv=None):
         sys.exit(f"ERROR: could not connect to Cloud SQL ({type(e).__name__}): {e}. Nothing changed.")
 
     try:
-        cur = conn.cursor()
-        ids = sorted(pack_cols)
-        placeholders = ", ".join(["%s"] * len(ids))
-        cur.execute(f"SELECT id, table_columns FROM criteria WHERE answer_type = 'table_rows' AND id IN ({placeholders})", ids)
-        db_rows = {row[0]: row[1] for row in cur.fetchall()}
-        to_update, skipped = plan_updates(pack_cols, db_rows)
-
-        for s in skipped:
-            print(f"skip   {s['id']}: {s['reason']}")
-        for t in to_update:
-            print(f"{'UPDATE' if args.apply else 'would update'} {t['id']}: {len(t['columns'])} columns -> {t['columns']}")
-
-        if not args.apply:
-            conn.rollback()
-            print(f"DRY RUN: {len(to_update)} criteria would be updated. Re-run with --apply to write.")
-            return
-        for t in to_update:
-            cur.execute("UPDATE criteria SET table_columns = CAST(%s AS JSONB) "
-                        "WHERE id = %s AND (table_columns IS NULL OR table_columns = '[]'::jsonb)",
-                        (json.dumps(t["columns"]), t["id"]))
-            if cur.rowcount != 1:
-                raise RuntimeError(f"expected to update 1 row for {t['id']}, updated {cur.rowcount}")
-        conn.commit()
-        print(f"OK: updated {len(to_update)} criteria.")
+        run_backfill(conn, pack_cols, args.apply)
     except Exception as e:
         conn.rollback()
         sys.exit(f"ERROR: backfill failed and was rolled back ({type(e).__name__}): {e}")
