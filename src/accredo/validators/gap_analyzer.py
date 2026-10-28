@@ -84,7 +84,11 @@ def run_gap_analysis(*, period: ReviewPeriod,
                      programs: Optional[Iterable[str]] = None,
                      faculty: Iterable[FacultyMember] = (),
                      cohorts: Iterable[CohortEmploymentMetrics] = ()) -> GapReport:
-    """All findings for one review period. Faculty evaluations are aged against period.end."""
+    """All findings for one review period. Faculty evaluations are aged against period.end.
+
+    Faculty experience minimums (3.0 years non-degree, 4.0 degree-level) come from
+    FacultyMember.findings(), so the per-record and combined results can never disagree.
+    """
     pac_meetings = list(pac_meetings)
     findings: list[ComplianceFinding] = []
     for rec in management:

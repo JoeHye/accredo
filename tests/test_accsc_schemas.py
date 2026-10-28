@@ -137,11 +137,33 @@ def test_faculty_missing_transcripts_is_substantive():
     assert f.compliance_status() is S.SUBSTANTIVE_DEFICIENCY and rules(f.findings()) == ["FAC_TRANSCRIPTS"]
 
 
-@pytest.mark.parametrize("years,flagged", [(1.99, True), (2.0, False), (0, True)])
-def test_faculty_industry_experience_threshold(years, flagged):
-    f = faculty(relevant_industry_experience_years=years)
+@pytest.mark.parametrize("level,years,flagged", [
+    ("Diploma", 2.9, True), ("Diploma", 3.0, False), ("Certificate", 0, True), ("Non-degree", 3.0, False),
+    ("Associate", 3.9, True), ("Associate (AAS)", 4.0, False),
+    ("Bachelor's", 3.5, True), ("Baccalaureate", 4.0, False),
+])
+def test_faculty_industry_experience_threshold(level, years, flagged):
+    f = faculty(degree_level=level, relevant_industry_experience_years=years)
     assert ("FAC_INDUSTRY_EXPERIENCE" in rules(f.findings())) is flagged
     assert f.compliance_status() is (S.SUBSTANTIVE_DEFICIENCY if flagged else S.COMPLIANT)
+
+
+def test_faculty_non_degree_message_states_the_three_year_minimum():
+    msg = faculty(degree_level="Diploma", relevant_industry_experience_years=2.9).findings()[0].message
+    assert msg == "2.9 years of related practical experience; at least 3 required for non-degree courses."
+
+
+def test_faculty_unrecognised_level_uses_baseline_and_is_flagged_unverified():
+    passes = faculty(degree_level="Master's", relevant_industry_experience_years=3.0)
+    assert rules(passes.findings()) == ["FAC_DEGREE_LEVEL"] and passes.compliance_status() is S.UNVERIFIED
+    fails = faculty(degree_level="Master's", relevant_industry_experience_years=2.9)
+    assert rules(fails.findings()) == ["FAC_DEGREE_LEVEL", "FAC_INDUSTRY_EXPERIENCE"]
+    assert fails.compliance_status() is S.SUBSTANTIVE_DEFICIENCY
+
+
+def test_degree_level_words_do_not_match_inside_other_words():
+    assert faculty(degree_level="Basic certificate").teaches_degree_level() is False   # "ba" in "basic"
+    assert faculty(degree_level="Diploma (non-degree)").teaches_degree_level() is False
 
 
 def test_faculty_continuing_ed_below_one_hour_is_partial():
