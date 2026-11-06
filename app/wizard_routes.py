@@ -3,6 +3,7 @@ import os
 import glob
 import logging
 import difflib
+import json
 from datetime import datetime
 from flask import Blueprint, jsonify, request, render_template, send_file
 from flask_login import login_required, current_user
@@ -81,16 +82,90 @@ TABLE_MAX_ROWS = 500
 TABLE_MAX_CELL_CHARS = 2000
 
 
-def table_row_has_data(row_data):
-    """A table row counts only if at least one cell has non-blank text."""
-    return isinstance(row_data, dict) and any(
-        isinstance(v, str) and v.strip() for v in row_data.values())
+def normalize_table_columns(raw):
+    """Criterion.table_columns as [{"key", "label", "required"}].
+
+    Accepts a list of strings, a list of {"key", "label", "required"} objects (label defaults to key and
+    vice versa), or either form JSON-encoded as a string. Anything malformed yields [] (logged), so a bad
+    pack value shows "no columns configured" instead of raising.
+    """
+    if isinstance(raw, str):
+        try:
+            raw = json.loads(raw)
+        except ValueError:
+            logger.error(f"table_columns is a string that is not valid JSON: {raw[:100]!r}")
+            return []
+    if raw is None:
+        return []
+    if not isinstance(raw, list):
+        logger.error(f"table_columns must be a list, got {type(raw).__name__}")
+        return []
+    columns, seen = [], set()
+    for i, col in enumerate(raw):
+        if isinstance(col, str):
+            key, label, required = col, col, False
+        elif isinstance(col, dict):
+            key = col.get("key") or col.get("label")
+            label = col.get("label") or key
+            required = col.get("required") is True
+        else:
+            key = None
+        if not isinstance(key, str) or not key.strip() or not isinstance(label, str):
+            logger.error(f"table_columns entry {i} is malformed: {col!r}")
+            return []
+        if key in seen:
+            logger.error(f"table_columns has duplicate key {key!r}")
+            return []
+        seen.add(key)
+        columns.append({"key": key, "label": label, "required": required})
+    return columns
 
 
-def table_has_data(response_id):
-    """Shared completeness rule for table_rows answers, used by every completion aggregator."""
-    rows = TableRowData.query.filter_by(response_id=response_id).all()
-    return any(table_row_has_data(r.row_data) for r in rows)
+def _cell_has_text(value):
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, (int, float)):
+        return True
+    return isinstance(value, str) and bool(value.strip())
+
+
+def table_row_has_data(row_data, columns=None):
+    """True if at least one cell has non-blank text. With columns, only those columns' keys count."""
+    if not isinstance(row_data, dict):
+        return False
+    keys = [c["key"] for c in columns] if columns is not None else list(row_data)
+    return any(_cell_has_text(row_data.get(k)) for k in keys)
+
+
+def is_table_response_complete(criterion, table_data):
+    """Completion rule for table_rows answers (shared by every completion aggregator and the save route).
+
+    table_data is a list of row dicts keyed by column key. Complete only if at least one row is valid:
+    when columns are marked required, every required column has non-blank text; otherwise at least one
+    defined column does. Keys that are not defined columns, blank or whitespace cells, and non-dict rows
+    are ignored. A criterion with no usable columns is never complete.
+    """
+    if not isinstance(table_data, list) or not table_data:
+        return False
+    columns = normalize_table_columns(criterion.table_columns)
+    if not columns:
+        return False
+    required = [c for c in columns if c["required"]]
+    for row in table_data:
+        if not isinstance(row, dict):
+            continue
+        if required:
+            if all(_cell_has_text(row.get(c["key"])) for c in required):
+                return True
+        elif table_row_has_data(row, columns):
+            return True
+    return False
+
+
+def table_has_data(response_id, criterion):
+    """Stored rows for a response, checked with is_table_response_complete."""
+    rows = TableRowData.query.filter_by(response_id=response_id).order_by(TableRowData.row_index).all()
+    return is_table_response_complete(criterion, [r.row_data for r in rows])
 
 
 def calculate_completeness(application_id):
@@ -139,7 +214,7 @@ def calculate_completeness(application_id):
 
         has_table_rows = False
         if c.answer_type == "table_rows" and resp:
-            has_table_rows = table_has_data(resp.id)
+            has_table_rows = table_has_data(resp.id, c)
 
         is_complete = has_narrative or is_sub_na or criterion_na or has_exhibit or has_table_rows
 
@@ -445,7 +520,7 @@ def get_subsections(application_id):
 
                 has_table_rows = False
                 if c.answer_type == "table_rows" and resp:
-                    has_table_rows = table_has_data(resp.id)
+                    has_table_rows = table_has_data(resp.id, c)
 
                 if has_narrative or is_na or has_exhibit or has_table_rows:
                     answered_count += 1
@@ -621,8 +696,10 @@ def get_table_rows(application_id, criterion_id):
             table_rows = TableRowData.query.filter_by(response_id=resp.id).order_by(TableRowData.row_index).all()
             rows = [{"id": r.id, "row_index": r.row_index, "row_data": r.row_data} for r in table_rows]
 
+        raw_columns = criterion.table_columns
         return jsonify({
-            "table_columns": criterion.table_columns or [],
+            # A plain list is passed through as stored; anything else (e.g. a JSON string) is normalized.
+            "table_columns": raw_columns if isinstance(raw_columns, list) else normalize_table_columns(raw_columns),
             "rows": rows
         }), 200
 
@@ -657,9 +734,9 @@ def save_table_rows(application_id, criterion_id):
         if criterion.answer_type != "table_rows":
             return jsonify({"error": "This question does not accept table rows.", "code": "not_a_table_criterion"}), 400
 
-        columns = criterion.table_columns or []
+        columns = normalize_table_columns(criterion.table_columns)
         if not columns:
-            logger.error(f"Table criterion {criterion_id} has no table_columns configured; cannot save rows")
+            logger.error(f"Table criterion {criterion_id} has no usable table_columns; cannot save rows")
             return jsonify({"error": "This table has no columns configured. Please contact support.",
                             "code": "table_not_configured"}), 422
 
@@ -667,12 +744,13 @@ def save_table_rows(application_id, criterion_id):
         for i, row in enumerate(rows_data, start=1):
             if not isinstance(row, dict):
                 return jsonify({"error": f"Row {i} is not valid.", "code": "invalid_row"}), 400
-            unknown = set(row) - set(columns)
+            unknown = set(row) - {c["key"] for c in columns}
             if unknown:
-                return jsonify({"error": f"Row {i} has unknown column(s): {', '.join(sorted(unknown))}.",
+                return jsonify({"error": f"Row {i} has unknown column(s): {', '.join(sorted(map(str, unknown)))}.",
                                 "code": "unknown_column"}), 400
             cleaned = {}
-            for col in columns:
+            for column in columns:
+                col = column["key"]
                 value = row.get(col, "")
                 if value is None:
                     value = ""
@@ -684,7 +762,7 @@ def save_table_rows(application_id, criterion_id):
                     return jsonify({"error": f"Row {i}, column '{col}' is longer than {TABLE_MAX_CELL_CHARS} characters.",
                                     "code": "cell_too_long"}), 400
                 cleaned[col] = value
-            if table_row_has_data(cleaned):  # fully blank rows are not stored
+            if table_row_has_data(cleaned, columns):  # fully blank rows are not stored
                 clean_rows.append(cleaned)
 
         resp = Response.query.filter_by(
@@ -724,10 +802,13 @@ def save_table_rows(application_id, criterion_id):
         db.session.commit()
         logger.info(f"Successfully updated table rows for app {application_id}, criterion {criterion_id}")
 
+        is_complete = is_table_response_complete(criterion, clean_rows)
         return jsonify({
+            "status": "saved",
             "criterion_id": criterion_id,
             "rows": saved_rows,
-            "complete": len(saved_rows) > 0,
+            "is_complete": is_complete,
+            "complete": is_complete,  # older name, kept for existing clients
             "saved_at": now.isoformat()
         }), 200
 

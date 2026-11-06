@@ -22,6 +22,8 @@ def create_app():
         logger.info(f"No DATABASE_URL found. Falling back to local SQLite at absolute path: {db_path}")
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    # Hard cap on any request body (exhibit uploads included); larger requests get 413 before parsing.
+    app.config["MAX_CONTENT_LENGTH"] = 25 * 1024 * 1024  # 25 MB
     if not db_url.startswith("sqlite"):
         app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True, "pool_recycle": 280}
     secret_key = os.environ.get("SECRET_KEY")
@@ -68,6 +70,14 @@ def create_app():
     app.register_blueprint(wizard_bp)
     app.register_blueprint(exhibit_bp)
     app.register_blueprint(auth_bp)
+    @app.errorhandler(413)
+    def request_too_large(e):
+        logger.warning(f"Rejected request over MAX_CONTENT_LENGTH: {request.method} {request.path} "
+                       f"(Content-Length {request.content_length})")
+        message = "The upload is too large. Files must be smaller than 25 MB."
+        if request.path.startswith("/api/"):
+            return jsonify({"status": "error", "error": message, "code": "file_too_large"}), 413
+        return message, 413
     @app.route("/health", methods=["GET"])
     def health_check():
         try:

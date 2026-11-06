@@ -911,6 +911,32 @@ const tableColumnsByCriterion = {};
 const tableSaveState = {};
 const TABLE_AUTOSAVE_DELAY_MS = 1500;
 
+// table_columns may be ["Year", ...], [{key, label, required}, ...], or either as a JSON string.
+// Returns [{key, label, required}] or [] if anything is malformed (the editor then says so).
+function normalizeTableColumns(raw) {
+    let cols = raw;
+    if (typeof cols === "string") {
+        try { cols = JSON.parse(cols); } catch (e) { return []; }
+    }
+    if (!Array.isArray(cols)) return [];
+    const out = [];
+    const seen = new Set();
+    for (const col of cols) {
+        let key, label, required = false;
+        if (typeof col === "string") {
+            key = col; label = col;
+        } else if (col && typeof col === "object") {
+            key = col.key || col.label;
+            label = col.label || key;
+            required = col.required === true;
+        }
+        if (typeof key !== "string" || !key.trim() || typeof label !== "string" || seen.has(key)) return [];
+        seen.add(key);
+        out.push({ key, label, required });
+    }
+    return out;
+}
+
 async function loadTableRows(appId, criterionId, columns) {
     const container = document.getElementById(`table-container-${criterionId}`);
     if (!container) return;
@@ -931,16 +957,17 @@ async function loadTableRows(appId, criterionId, columns) {
             </div>`;
         return;
     }
-    const cols = (Array.isArray(columns) && columns.length) ? columns
-        : (Array.isArray(data.table_columns) ? data.table_columns : []);
+    const pageCols = normalizeTableColumns(columns);
+    const cols = pageCols.length ? pageCols : normalizeTableColumns(data.table_columns);
     renderTableEditor(appId, criterionId, cols, Array.isArray(data.rows) ? data.rows : []);
 }
 
-function renderTableEditor(appId, criterionId, columns, rows) {
+function renderTableEditor(appId, criterionId, rawColumns, rows) {
     const container = document.getElementById(`table-container-${criterionId}`);
     if (!container) return;
 
-    if (!Array.isArray(columns) || columns.length === 0) {
+    const columns = normalizeTableColumns(rawColumns);
+    if (columns.length === 0) {
         // Without columns there is nothing to type into; say so instead of showing locked rows.
         container.innerHTML = `<div role="alert" style="font-size: 12px; color: #b91c1c;">This table has no columns configured yet, so it can't be edited. Please contact support.</div>`;
         return;
@@ -954,7 +981,7 @@ function renderTableEditor(appId, criterionId, columns, rows) {
                     <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
     `;
     columns.forEach(col => {
-        html += `<th style="padding: 8px; text-align: left; border: 1px solid #cbd5e1; color: #334155;">${escapeHtml(col)}</th>`;
+        html += `<th style="padding: 8px; text-align: left; border: 1px solid #cbd5e1; color: #334155;">${escapeHtml(col.label)}${col.required ? ' <span title="Required" style="color: #dc2626;">*</span>' : ""}</th>`;
     });
     html += `<th style="padding: 8px; text-align: center; border: 1px solid #cbd5e1; width: 60px;">Action</th></tr></thead><tbody>`;
 
@@ -996,8 +1023,8 @@ function renderTableEditor(appId, criterionId, columns, rows) {
 function generateTableRowHtml(columns, rowData) {
     let rowHtml = `<tr style="border-bottom: 1px solid #e2e8f0;">`;
     columns.forEach((col, i) => {
-        const val = rowData[col] !== undefined && rowData[col] !== null ? rowData[col] : "";
-        rowHtml += `<td style="padding: 6px; border: 1px solid #cbd5e1;"><input type="text" data-col-index="${i}" aria-label="${escapeHtml(col)}" value="${escapeHtml(val)}" style="width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 3px; font-size: 12px; box-sizing: border-box;" /></td>`;
+        const val = rowData[col.key] !== undefined && rowData[col.key] !== null ? rowData[col.key] : "";
+        rowHtml += `<td style="padding: 6px; border: 1px solid #cbd5e1;"><input type="text" data-col-index="${i}" aria-label="${escapeHtml(col.label)}" value="${escapeHtml(val)}" style="width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 3px; font-size: 12px; box-sizing: border-box;" /></td>`;
     });
     rowHtml += `<td style="padding: 6px; border: 1px solid #cbd5e1; text-align: center;"><button type="button" onclick="removeTableRow(this)" style="background: none; border: none; color: #dc2626; cursor: pointer; font-weight: bold; font-size: 14px;" title="Delete Row" aria-label="Delete row">&times;</button></td>`;
     rowHtml += `</tr>`;
@@ -1005,7 +1032,7 @@ function generateTableRowHtml(columns, rowData) {
 }
 
 function addTableRow(criterionId, legacyColumns) {
-    const columns = tableColumnsByCriterion[criterionId] || legacyColumns || [];
+    const columns = tableColumnsByCriterion[criterionId] || normalizeTableColumns(legacyColumns);
     const tbody = document.querySelector(`#table-elem-${criterionId} tbody`);
     if (!tbody || columns.length === 0) return;
     tbody.insertAdjacentHTML("beforeend", generateTableRowHtml(columns, {}));
@@ -1033,7 +1060,7 @@ function collectTableRows(criterionId) {
         const rowData = {};
         columns.forEach((col, i) => {
             const input = tr.querySelector(`input[data-col-index="${i}"]`);
-            rowData[col] = input ? input.value : "";
+            rowData[col.key] = input ? input.value : "";
         });
         rows.push(rowData);
     });
@@ -1082,7 +1109,12 @@ async function saveTableRows(appId, criterionId) {
             });
             if (!response.ok) throw await readApiError(response, "Save failed");
             const result = await response.json();
-            setStatus("save-success", `Saved at ${new Date(result.saved_at || Date.now()).toLocaleTimeString()}`);
+            const savedAt = new Date(result.saved_at || Date.now()).toLocaleTimeString();
+            if (result.is_complete === false) {
+                setStatus("save-saving", `Saved at ${savedAt} — not complete yet: fill in at least one row.`);
+            } else {
+                setStatus("save-success", `Saved at ${savedAt}`);
+            }
             loadCompleteness();
             loadSubsections();
         } catch (err) {
