@@ -237,10 +237,15 @@ def calculate_completeness(application_id):
         "incomplete_criteria": incomplete_criteria
     }
 
+def ai_drafting_configured() -> bool:
+    """Same check the draft route makes; the page uses it to disable the button up front."""
+    return bool(os.environ.get("GOOGLE_CLOUD_PROJECT") and os.environ.get("GOOGLE_CLOUD_LOCATION"))
+
+
 @wizard_bp.route("/wizard", methods=["GET"])
 @login_required
 def wizard_page():
-    return render_template("wizard.html")
+    return render_template("wizard.html", ai_drafting_available=ai_drafting_configured())
 
 @wizard_bp.route("/api/applications", methods=["GET"])
 @login_required

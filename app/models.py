@@ -6,7 +6,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
 from sqlalchemy.dialects.postgresql import JSONB
 
-JSONType = JSONB().with_variant(SQLiteJSON(), "sqlite")
+# none_as_null: Python None is stored as SQL NULL on both databases. The default stored JSON 'null',
+# which IS NULL does not match on Postgres (the cause of the failed table_columns backfill).
+JSONType = JSONB(none_as_null=True).with_variant(SQLiteJSON(none_as_null=True), "sqlite")
 
 class Users(db.Model, UserMixin):
     __tablename__ = "users"

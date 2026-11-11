@@ -5,7 +5,7 @@ from datetime import datetime
 from xml.sax.saxutils import escape
 from PIL import Image as PILImage
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle, Image as RLImage
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle, KeepTogether, Image as RLImage
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
@@ -16,6 +16,24 @@ logger = logging.getLogger(__name__)
 
 def safe_text(s) -> str:
     return escape(str(s)) if s is not None else ""
+
+
+READY_LABEL = "FINAL SUBMISSION READY"
+DRAFT_LABEL = "DRAFT (INCOMPLETE)"
+
+
+def readiness(completeness, criteria_by_id):
+    """(label, detail lines) for the cover banner, from calculate_completeness() output."""
+    missing = completeness["incomplete_criteria"]
+    if not missing:
+        return READY_LABEL, [f"All {completeness['total_required']} criteria pass validation."]
+    exhibits = [m["criterion_id"] for m in missing
+                if getattr(criteria_by_id.get(m["criterion_id"]), "answer_type", None) == "exhibit"]
+    lines = [f"{completeness['completed']} of {completeness['total_required']} criteria complete "
+             f"({completeness['percentage']}%). {len(missing)} missing, {len(exhibits)} of them exhibits."]
+    shown = [m["criterion_id"] for m in missing[:15]]
+    lines.append("Missing: " + ", ".join(shown) + (f" and {len(missing) - 15} more" if len(missing) > 15 else ""))
+    return DRAFT_LABEL, lines
 
 def generate_report(application_id: int) -> str:
     report_dir = os.environ.get("REPORT_OUTPUT_DIR")
@@ -50,6 +68,12 @@ def generate_report(application_id: int) -> str:
         criteria = Criterion.query.filter_by(standard_pack_id=pack.id).order_by(Criterion.sort_order).all()
         responses = Response.query.filter_by(application_id=application_id).all()
         response_map = {r.criterion_id: r for r in responses}
+
+        stage = "computing_readiness"
+        # Imported here: wizard_routes imports this module. Same rules as the on-screen progress counter.
+        from app.wizard_routes import calculate_completeness, is_table_response_complete, normalize_table_columns
+        completeness = calculate_completeness(application_id)
+        readiness_label, readiness_lines = readiness(completeness, {c.id: c for c in criteria})
 
         stage = "structuring_content"
         sections_dict = {}
@@ -93,10 +117,38 @@ def generate_report(application_id: int) -> str:
 
         table_cell_style = ParagraphStyle('TableCell', parent=styles['Normal'], fontSize=8.5, leading=11, textColor=colors.HexColor("#0f172a"))
         table_header_style = ParagraphStyle('TableCellHeader', parent=styles['Normal'], fontSize=8.5, leading=11, textColor=colors.HexColor("#0f172a"), fontName='Helvetica-Bold')
+        is_ready = readiness_label == READY_LABEL
+        banner_style = ParagraphStyle('ReadinessBanner', parent=styles['Normal'], fontSize=16, leading=20, alignment=1,
+                                      fontName='Helvetica-Bold', textColor=colors.white,
+                                      backColor=colors.HexColor("#15803d" if is_ready else "#b91c1c"),
+                                      borderPadding=(8, 8, 8, 8), spaceBefore=6, spaceAfter=14)
+        banner_detail_style = ParagraphStyle('ReadinessDetail', parent=subtitle_style, fontSize=9.5, leading=13,
+                                             textColor=colors.HexColor("#15803d" if is_ready else "#b91c1c"))
+
+        def exhibit_index(docs):
+            """Filename, upload date (UTC), size and exhibit reference for every uploaded file."""
+            data = [[Paragraph(h, table_header_style) for h in ("Exhibit", "File", "Uploaded (UTC)", "Size")]]
+            for d in docs:
+                uploaded = d.uploaded_at.strftime("%Y-%m-%d %H:%M") if d.uploaded_at else "unknown"
+                size_kb = f"{(d.file_size_bytes or 0) / 1024:,.0f} KB"
+                data.append([Paragraph(f"E-{d.id}", table_cell_style), Paragraph(safe_text(d.filename), table_cell_style),
+                             Paragraph(uploaded, table_cell_style), Paragraph(size_kb, table_cell_style)])
+            t = Table(data, hAlign='LEFT', repeatRows=1, colWidths=[50, 230, 100, 70])
+            t.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#f1f5f9")),
+                ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#cbd5e1")),
+                ('TOPPADDING', (0,0), (-1,-1), 3),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+            ]))
+            return t
 
         story = []
         story.append(Spacer(1, 100))
         story.append(Paragraph("ACCSC Self-Evaluation Report (SER)", title_style))
+        story.append(Spacer(1, 15))
+        story.append(Paragraph(readiness_label, banner_style))
+        for line in readiness_lines:
+            story.append(Paragraph(safe_text(line), banner_detail_style))
         story.append(Spacer(1, 15))
         story.append(Paragraph(f"<b>Portfolio:</b> {safe_text(portfolio_name)}", subtitle_style))
         story.append(Paragraph(f"<b>Application ID:</b> {application_id}", subtitle_style))
@@ -129,12 +181,14 @@ def generate_report(application_id: int) -> str:
                 def render_criterion_recursive(crit):
                     resp = response_map.get(crit.id)
                     narrative = resp.narrative_text if resp and resp.narrative_text else ""
+                    block = []  # heading + question + answer: kept on one page when it fits (KeepTogether)
                     crit_heading = f"<b>Item {safe_text(crit.item_number)}</b> (Criterion ID: {safe_text(crit.id)})"
-                    story.append(Paragraph(crit_heading, criterion_title_style))
-                    story.append(Paragraph(safe_text(crit.question_text), question_style))
+                    block.append(Paragraph(crit_heading, criterion_title_style))
+                    block.append(Paragraph(safe_text(crit.question_text), question_style))
 
                     if crit.answer_type == "exhibit":
-                        docs = EvidenceDocument.query.filter_by(response_id=resp.id).all() if resp else []
+                        docs = (EvidenceDocument.query.filter_by(response_id=resp.id)
+                                .order_by(EvidenceDocument.uploaded_at, EvidenceDocument.id).all() if resp else [])
                         if docs:
                             gcs_bucket_name = os.environ.get("GCS_BUCKET_NAME")
                             for d in docs:
@@ -149,7 +203,7 @@ def generate_report(application_id: int) -> str:
                                             blob_path = d.gcs_path[len(prefix):] if d.gcs_path.startswith(prefix) else d.gcs_path
                                             bucket = client.bucket(gcs_bucket_name)
                                             blob = bucket.blob(blob_path)
-                                            file_bytes = blob.download_as_bytes()
+                                            file_bytes = blob.download_as_bytes(timeout=15)
                                         else:
                                             if os.path.exists(d.gcs_path):
                                                 with open(d.gcs_path, "rb") as f:
@@ -168,28 +222,28 @@ def generate_report(application_id: int) -> str:
 
                                             img_io = io.BytesIO(file_bytes)
                                             rl_img = RLImage(img_io, width=scaled_w, height=scaled_h)
-                                            story.append(rl_img)
-                                            story.append(Paragraph(f"<b>Attached Image:</b> {safe_text(d.filename)}", narrative_style))
+                                            block.append(rl_img)
+                                            block.append(Paragraph(f"<b>Attached Image:</b> {safe_text(d.filename)}", narrative_style))
                                         else:
-                                            story.append(Paragraph(f"<b>Attached Image:</b> {safe_text(d.filename)} <i>[File content unreadable]</i>", narrative_style))
+                                            block.append(Paragraph(f"<b>Attached Image:</b> {safe_text(d.filename)} <i>[File content unreadable]</i>", narrative_style))
                                     except Exception as img_err:
                                         logger.error(f"Failed to embed image exhibit {d.filename}: {str(img_err)}", exc_info=True)
-                                        story.append(Paragraph(f"<b>Attached Image:</b> {safe_text(d.filename)} <i>[Error loading image]</i>", narrative_style))
-                                elif ext == "pdf":
-                                    story.append(Paragraph(f"<b>Attached (PDF):</b> {safe_text(d.filename)}", narrative_style))
-                                elif ext in {"doc", "docx"}:
-                                    story.append(Paragraph(f"<b>Attached (Word):</b> {safe_text(d.filename)}", narrative_style))
-                                else:
-                                    story.append(Paragraph(f"<b>Attached:</b> {safe_text(d.filename)}", narrative_style))
+                                        block.append(Paragraph(f"<b>Attached Image:</b> {safe_text(d.filename)} <i>[Error loading image]</i>", narrative_style))
+                                # Every file (images included) is listed in the exhibit table below.
+                            block.append(exhibit_index(docs))
                         else:
-                            story.append(Paragraph("[EXHIBIT REQUIRED — FILE UPLOAD NOT YET IMPLEMENTED]", incomplete_style))
+                            block.append(Paragraph("[EXHIBIT REQUIRED — NO FILE UPLOADED]", incomplete_style))
                     elif crit.answer_type == "table_rows":
                         rows = TableRowData.query.filter_by(response_id=resp.id).order_by(TableRowData.row_index).all() if resp else []
-                        if rows and crit.table_columns:
-                            table_data = [[Paragraph(safe_text(col), table_header_style) for col in crit.table_columns]]
-                            for r in rows:
-                                table_data.append([Paragraph(safe_text(r.row_data.get(col, "")), table_cell_style) for col in crit.table_columns])
-                            t = Table(table_data, hAlign='LEFT')
+                        row_dicts = [r.row_data for r in rows if isinstance(r.row_data, dict)]
+                        columns = normalize_table_columns(crit.table_columns)
+                        if columns and is_table_response_complete(crit, row_dicts):
+                            table_data = [[Paragraph(safe_text(col["label"]), table_header_style) for col in columns]]
+                            for row in row_dicts:
+                                table_data.append([Paragraph(safe_text(row.get(col["key"], "")), table_cell_style) for col in columns])
+                            # Equal fixed widths: auto-sizing let one long cell squeeze every other column to a letter
+                            # per line. With a fixed width, reportlab splits an over-long word inside its own cell.
+                            t = Table(table_data, hAlign='LEFT', repeatRows=1, colWidths=[doc.width / len(columns)] * len(columns))
                             t.setStyle(TableStyle([
                                 ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#f1f5f9")),
                                 ('TEXTCOLOR', (0,0), (-1,0), colors.HexColor("#0f172a")),
@@ -197,17 +251,18 @@ def generate_report(application_id: int) -> str:
                                 ('TOPPADDING', (0,0), (-1,-1), 4),
                                 ('BOTTOMPADDING', (0,0), (-1,-1), 4),
                             ]))
-                            story.append(t)
+                            block.append(t)
                         else:
-                            story.append(Paragraph("[TABLE DATA — NOT YET ANSWERED]", incomplete_style))
+                            block.append(Paragraph("[TABLE DATA — NOT YET ANSWERED]", incomplete_style))
                     else:
                         if narrative.strip():
                             escaped_narrative = safe_text(narrative).replace('\n', '<br/>')
-                            story.append(Paragraph(escaped_narrative, narrative_style))
+                            block.append(Paragraph(escaped_narrative, narrative_style))
                         else:
-                            story.append(Paragraph("[INCOMPLETE — NOT YET ANSWERED]", incomplete_style))
+                            block.append(Paragraph("[INCOMPLETE — NOT YET ANSWERED]", incomplete_style))
 
-                    story.append(Spacer(1, 4))
+                    block.append(Spacer(1, 4))
+                    story.append(KeepTogether(block))
                     sub_crits = [sc for sc in sub_data["criteria"] if sc.parent_id == crit.id]
                     for sc in sub_crits:
                         render_criterion_recursive(sc)

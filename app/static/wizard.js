@@ -556,7 +556,7 @@ function createCriterionCard(crit, copySources) {
                 setTimeout(() => loadExhibits(applicationId, sc.id), 0);
             } else {
                 const draftButtonHtml = sc.answer_type === "narrative" ? `
-                    <button type="button" id="draft-btn-${sc.id}" onclick="draftAnswer('${sc.id}')" style="margin-top: 6px; padding: 4px 10px; background: #8b5cf6; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;">Draft this answer</button>
+                    ${draftButtonHtml(sc.id)}
                     <span id="draft-error-${sc.id}" style="margin-left: 8px; font-size: 12px; color: #dc2626;"></span>
                 ` : "";
 
@@ -628,7 +628,7 @@ function createCriterionCard(crit, copySources) {
         setTimeout(() => loadExhibits(applicationId, crit.id), 0);
     } else {
         const topDraftButtonHtml = crit.answer_type === "narrative" ? `
-            <button type="button" id="draft-btn-${crit.id}" onclick="draftAnswer('${crit.id}')" style="margin-top: 6px; padding: 4px 10px; background: #8b5cf6; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;">Draft this answer</button>
+            ${draftButtonHtml(crit.id)}
             <span id="draft-error-${crit.id}" style="margin-left: 8px; font-size: 12px; color: #dc2626;"></span>
         ` : "";
 
@@ -731,7 +731,7 @@ function renderExhibitEditor(appId, criterionId, files) {
         files.forEach(f => {
             html += `
                 <div style="display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 6px 10px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 13px;">
-                    <span>📎 <b>${escapeHtml(f.filename)}</b> (${Math.round(f.file_size_bytes / 1024)} KB)</span>
+                    <span style="min-width: 0; overflow-wrap: anywhere;">📎 <b>${escapeHtml(f.filename)}</b> (${Math.round(f.file_size_bytes / 1024)} KB)</span>
                     <button type="button" onclick="deleteExhibit('${appId}', '${criterionId}', ${f.id})" style="background: none; border: none; color: #dc2626; cursor: pointer; font-weight: bold; font-size: 12px;">Delete</button>
                 </div>
             `;
@@ -862,7 +862,21 @@ function copyAnswer(targetCriterionId) {
     textarea.value = sourceText;
 }
 
+// The server sets window.AI_DRAFTING_AVAILABLE from the same env check the draft route uses.
+function aiDraftingAvailable() {
+    return typeof window.AI_DRAFTING_AVAILABLE === "undefined" || window.AI_DRAFTING_AVAILABLE === true;
+}
+
+function draftButtonHtml(criterionId) {
+    const base = "margin-top: 6px; padding: 4px 10px; border: none; border-radius: 4px; font-size: 12px; font-weight: bold;";
+    if (!aiDraftingAvailable()) {
+        return `<button type="button" id="draft-btn-${escapeHtml(criterionId)}" disabled aria-disabled="true" title="AI drafting offline" style="${base} background: #cbd5e1; color: #64748b; cursor: not-allowed;">Draft this answer</button>`;
+    }
+    return `<button type="button" id="draft-btn-${escapeHtml(criterionId)}" onclick="draftAnswer('${escapeHtml(criterionId)}')" style="${base} background: #8b5cf6; color: white; cursor: pointer;">Draft this answer</button>`;
+}
+
 async function draftAnswer(criterionId) {
+    if (!aiDraftingAvailable()) return;
     if (!applicationId) return;
     const btn = document.getElementById(`draft-btn-${criterionId}`);
     const textarea = document.getElementById(`response-${criterionId}`);

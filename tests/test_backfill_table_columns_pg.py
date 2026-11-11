@@ -33,7 +33,6 @@ def pg(pg_uri, monkeypatch):
     import psycopg2
     from app import create_app, db
     from app.loader import load_standard_pack
-    from app.models import Criterion
 
     monkeypatch.setenv("DATABASE_URL", pg_uri.replace("postgresql://", "postgresql+psycopg2://", 1))
     monkeypatch.setenv("SECRET_KEY", "test-only")
@@ -44,13 +43,12 @@ def pg(pg_uri, monkeypatch):
         db.drop_all()
         db.create_all()
         load_standard_pack(INITIAL)
-        # Production state: the pack was loaded before the JSON fix, so the ORM wrote None -> JSON null.
-        for cid in FIVE:
-            db.session.get(Criterion, cid).table_columns = None
-        db.session.commit()
         db.engine.dispose()
     conn = psycopg2.connect(pg_uri)
     cur = conn.cursor()
+    # Production state: rows written before JSONType used none_as_null hold JSON null ('null'::jsonb),
+    # so write that directly rather than relying on how today's ORM stores None.
+    cur.execute("UPDATE criteria SET table_columns = 'null'::jsonb WHERE id = ANY(%s)", (FIVE,))
     cur.execute("UPDATE criteria SET table_columns = NULL WHERE id = 'I-A-6'")          # SQL NULL
     cur.execute("UPDATE criteria SET table_columns = '[]'::jsonb WHERE id = 'I-E-2'")   # empty list
     cur.execute("""UPDATE criteria SET table_columns = '""'::jsonb WHERE id = 'III-A-10'""")  # empty string
@@ -66,7 +64,27 @@ def stored(conn):
     return {r[0]: (r[1], r[2]) for r in cur.fetchall()}
 
 
-def test_orm_none_is_stored_as_json_null_and_old_guard_missed_it(pg):
+def test_orm_now_stores_none_as_sql_null(pg_uri, monkeypatch):
+    """JSONType uses none_as_null, so new writes of None are SQL NULL (not JSON 'null')."""
+    from app import create_app, db
+    from app.models import Criterion
+    monkeypatch.setenv("DATABASE_URL", pg_uri.replace("postgresql://", "postgresql+psycopg2://", 1))
+    monkeypatch.setenv("SECRET_KEY", "test-only")
+    app = create_app()
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+        from app.loader import load_standard_pack
+        load_standard_pack(INITIAL)
+        db.session.get(Criterion, "0-A-2").table_columns = None
+        db.session.commit()
+        kind = db.session.execute(db.text(
+            "SELECT COALESCE(jsonb_typeof(table_columns), 'SQL NULL') FROM criteria WHERE id = '0-A-2'")).scalar()
+        db.engine.dispose()
+    assert kind == "SQL NULL"
+
+
+def test_legacy_json_null_rows_and_old_guard_missed_them(pg):
     """Reproduces the production error: the old guarded UPDATE matched 0 rows for JSON null."""
     assert stored(pg)["0-A-2"] == (None, "null")
     cur = pg.cursor()
