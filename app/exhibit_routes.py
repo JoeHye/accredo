@@ -24,6 +24,7 @@ ALLOWED_TYPES = {
     "jpeg": "image/jpeg",
     "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     "doc": "application/msword",
+    "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 }
 ALLOWED_EXTENSIONS = set(ALLOWED_TYPES)
 MAX_FILE_SIZE = 25 * 1024 * 1024  # files must be strictly smaller than this
@@ -95,15 +96,19 @@ def detect_content_type(file_obj):
     if head.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"):
         return ALLOWED_TYPES["doc"]
     if head.startswith(b"PK\x03\x04"):
-        # Any ZIP starts like this; a Word document must contain word/document.xml.
+        # Any ZIP starts like this; Word needs word/document.xml, Excel needs xl/workbook.xml.
         try:
             with zipfile.ZipFile(file_obj) as zf:
-                is_docx = "word/document.xml" in zf.namelist()
+                names = set(zf.namelist())
         except (zipfile.BadZipFile, OSError):
-            is_docx = False
+            names = set()
         finally:
             file_obj.seek(0)
-        return ALLOWED_TYPES["docx"] if is_docx else None
+        if "word/document.xml" in names:
+            return ALLOWED_TYPES["docx"]
+        if "xl/workbook.xml" in names:
+            return ALLOWED_TYPES["xlsx"]
+        return None
     return None
 
 

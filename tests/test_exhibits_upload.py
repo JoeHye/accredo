@@ -388,3 +388,33 @@ def test_legacy_routes_share_the_same_data(env):
     err = c.post(f"/api/applications/{app_id}/responses/{CRIT}/exhibit", data={},
                  content_type="multipart/form-data").get_json()
     assert err["status"] == "error" and err["code"] == "no_file"
+
+
+# ---------- XLSX ----------
+
+def xlsx_bytes():
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        zf.writestr("[Content_Types].xml", "<Types/>")
+        zf.writestr("xl/workbook.xml", "<workbook/>")
+    return buf.getvalue()
+
+
+def test_xlsx_upload_is_accepted_and_typed(env, monkeypatch):
+    app, app_id, _ = env
+    log = install_fake_gcs(monkeypatch)
+    resp = post(login(app), app_id, xlsx_bytes(), "enrollment.xlsx")
+    assert resp.status_code == 201, resp.get_json()
+    assert resp.get_json()["file"]["filename"] == "enrollment.xlsx"
+    assert log[0][3] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+
+@pytest.mark.parametrize("data,name,code", [
+    (xlsx_bytes(), "renamed.docx", "file_type_mismatch"),      # spreadsheet named as Word
+    (docx_bytes(), "renamed.xlsx", "file_type_mismatch"),      # Word named as spreadsheet
+    (plain_zip_bytes(), "archive.xlsx", "invalid_file_type"),  # a ZIP that is neither
+])
+def test_xlsx_and_docx_are_not_interchangeable(env, data, name, code):
+    app, app_id, _ = env
+    assert_error(post(login(app), app_id, data, name), 400, code)
+    assert counts(app) == (0, 0)

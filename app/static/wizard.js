@@ -741,7 +741,7 @@ function renderExhibitEditor(appId, criterionId, files) {
 
     html += `
         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <input type="file" id="exhibit-file-${criterionId}" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="font-size: 12px;">
+            <input type="file" id="exhibit-file-${criterionId}" accept=".pdf,.doc,.docx,.xlsx,.jpg,.jpeg,.png" style="font-size: 12px;">
             <button type="button" onclick="uploadExhibit('${appId}', '${criterionId}')" style="padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;">Upload</button>
         </div>
     `;
