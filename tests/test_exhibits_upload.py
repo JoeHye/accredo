@@ -418,3 +418,34 @@ def test_xlsx_and_docx_are_not_interchangeable(env, data, name, code):
     app, app_id, _ = env
     assert_error(post(login(app), app_id, data, name), 400, code)
     assert counts(app) == (0, 0)
+
+
+# ---------- directive checklist: explicit DB fields, .sh, real >25 MB payload ----------
+
+@pytest.mark.parametrize("data,name", [(PDF, "catalog.pdf"), (docx_bytes(), "policy.docx"), (xlsx_bytes(), "enrollment.xlsx")])
+def test_upload_writes_evidence_row_with_every_field(env, data, name):
+    app, app_id, tmp_path = env
+    assert post(login(app), app_id, data, name, crit="0-B-2").status_code == 201
+    with app.app_context():
+        doc, criterion_id = (db.session.query(EvidenceDocument, Response.criterion_id)
+                             .join(Response, Response.id == EvidenceDocument.response_id).one())
+        assert (doc.filename, doc.file_size_bytes, criterion_id) == (name, len(data), "0-B-2")
+        assert doc.uploaded_at is not None
+        assert os.path.isabs(doc.gcs_path) and os.path.getsize(doc.gcs_path) == len(data)   # storage path
+
+
+@pytest.mark.parametrize("name", ["install.sh", "tool.exe", "macro.bat", "page.html"])
+def test_disallowed_extensions_are_rejected(env, name):
+    app, app_id, _ = env
+    assert_error(post(login(app), app_id, b"#!/bin/sh\necho hi\n", name), 400, "invalid_file_type")
+    assert counts(app) == (0, 0)
+
+
+def test_real_26_mb_upload_is_rejected_by_the_25_mb_request_cap(env):
+    """Full stack, real size: rejected with 413 and nothing stored (Flask's 25 MB request cap, backed by the route's own size check)."""
+    app, app_id, tmp_path = env
+    big = PDF + b"0" * (26 * 1024 * 1024)
+    assert_error(post(login(app), app_id, big, "big.pdf"), 413, "file_too_large")
+    assert counts(app) == (0, 0)
+    stored = tmp_path / "exhibits"
+    assert not stored.exists() or not os.listdir(stored)
